@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using HelloAzureCI.Models;
 
 namespace HelloAzureCI.Controllers
 {
@@ -10,7 +12,8 @@ namespace HelloAzureCI.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var helloTarget = ConfigurationManager.AppSettings["HelloTarget"];
+            return View(new IndexModel {World = helloTarget});
         }
 
         public ActionResult About()
