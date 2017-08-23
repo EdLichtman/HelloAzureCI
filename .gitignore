@@ -204,6 +204,11 @@ $RECYCLE.BIN/
 *.feature.xlsx.*
 *.Specs_*.html
 
+# Custom AppSettings and ConnectionStrings
+App_Data*
+
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+
+
