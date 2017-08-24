@@ -1,0 +1,21 @@
+#!/bin/bash
+
+gitrepo=https://github.com/Ed-Lichtman/HelloAzureCI
+webappname=mywebapp$RANDOM
+
+az group create --location westeurope --name myResourceGroup
+
+az appservice plan create --name $webappname --resource-group myResourceGroup --sku FREE
+
+# Create a web app.
+az webapp create --name $webappname --resource-group myResourceGroup --plan $webappname
+
+# Deploy code from a public GitHub repository. 
+az webapp deployment source config --name $webappname --resource-group myResourceGroup \
+--repo-url $gitrepo --branch master --manual-integration
+
+# Browse to the web app.
+az webapp browse --name $webappname --resource-group myResourceGroup
+
+# Cleanup
+az group delete --name myResourceGroup
