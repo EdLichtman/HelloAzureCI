@@ -89,9 +89,10 @@ call :ExecuteCmd "%MSBUILD_PATH%" "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\Hel
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. Run unit tests
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
-IF !ERRORLEVEL! NEQ 0 goto error
-
+::call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
+::IF !ERRORLEVEL! NEQ 0 goto error
+:: 3. Run unit tests
+Powershell.exe -executionpolicy remotesigned -File %DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1
 
 :: 3. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
