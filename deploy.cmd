@@ -40,15 +40,15 @@ IF NOT DEFINED NEXT_MANIFEST_PATH (
   )
 )
 
-IF NOT DEFINED KUDU_SYNC_CMD (
-  :: Install kudu sync
-  echo Installing Kudu Sync
-  call npm install kudusync -g --silent
-  IF !ERRORLEVEL! NEQ 0 goto error
+REM IF NOT DEFINED KUDU_SYNC_CMD (
+REM   :: Install kudu sync
+REM   echo Installing Kudu Sync
+REM   call npm install kudusync -g --silent
+REM   IF !ERRORLEVEL! NEQ 0 goto error
 
-  :: Locally just running "kuduSync" would also work
-  SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
-)
+REM   :: Locally just running "kuduSync" would also work
+REM   SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
+REM )
 IF NOT DEFINED DEPLOYMENT_TEMP (
   SET DEPLOYMENT_TEMP=%temp%\___deployTemp%random%
   SET CLEAN_LOCAL_DEPLOYMENT_TEMP=true
@@ -92,13 +92,13 @@ IF !ERRORLEVEL! NEQ 0 goto error
 ::call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
 ::IF !ERRORLEVEL! NEQ 0 goto error
 :: 3. Run unit tests
-Powershell.exe -executionpolicy remotesigned -File %DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1
+Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1"
 
-:: 3. KuduSync
-IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-  call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
-  IF !ERRORLEVEL! NEQ 0 goto error
-)
+REM :: 3. KuduSync
+REM IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
+REM   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
+REM   IF !ERRORLEVEL! NEQ 0 goto error
+REM )
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 goto end
