@@ -94,7 +94,7 @@ IF !ERRORLEVEL! NEQ 0 goto error
 Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1"
 
 :: 3b. Call vstest.console
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /Settings:"%DEPLOYMENT_SOURCE%\.runsettings"
 
 IF !ERRORLEVEL! NEQ 0 goto error
 
