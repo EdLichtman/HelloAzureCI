@@ -1,8 +1,8 @@
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $UnitTestsDir = "$ProjectDir\HelloAzureCIUnitTests"
 
-$appSettings = $Env: | where-object {$_.Name -contains "APPSETTING"} 
-$connectionStrings = $Env: | where-object {$_.Name -contains "CONNECTIONSTRING"} 
+$appSettings = $Env | where-object {$_.Name -contains "APPSETTING"} 
+$connectionStrings = $Env | where-object {$_.Name -contains "CONNECTIONSTRING"} 
 
 $nameValues = ''
 
