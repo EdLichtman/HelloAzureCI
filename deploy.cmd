@@ -1,5 +1,3 @@
-echo Customizing my deployment script!
-
 @if "%SCM_TRACE_LEVEL%" NEQ "4" @echo off
 
 :: ----------------------
@@ -97,7 +95,7 @@ Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzu
 Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\CreateRunSettings.ps1"
 
 :: 3c. Call vstest.console
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /Settings:"%DEPLOYMENT_SOURCE%\.runsettings"
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /TestAdapterPath: "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\packages\NUnit3TestAdapter.3.8.0\build\net35"::/Settings:"%DEPLOYMENT_SOURCE%\.runsettings"
 
 IF !ERRORLEVEL! NEQ 0 goto error
 
