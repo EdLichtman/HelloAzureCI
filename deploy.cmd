@@ -91,9 +91,12 @@ IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. Run unit tests
 :: 3a. Install NUnit3 Adapter
-Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1"
+Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\InstallNUnit3TestAdapter.ps1"
 
-:: 3b. Call vstest.console
+:: 3b. Create runsettings file
+Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\CreateRunSettings.ps1"
+
+:: 3c. Call vstest.console
 call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /Settings:"%DEPLOYMENT_SOURCE%\.runsettings"
 
 IF !ERRORLEVEL! NEQ 0 goto error
