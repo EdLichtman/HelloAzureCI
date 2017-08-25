@@ -88,8 +88,11 @@ IF !ERRORLEVEL! NEQ 0 goto error
 call :ExecuteCmd "%MSBUILD_PATH%" "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\HelloAzureCIUnitTests.csproj
 IF !ERRORLEVEL! NEQ 0 goto error
 
+Get-ChildItem -Recurse | Select-Object -ExpandProperty FullName -Path %DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests
+gci -r | select -exp FullName
+
 :: 3. Run unit tests
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\HelloAzureCIUnitTests\bin\HelloAzureCIUnitTests.dll
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\HelloAzureCIUnitTests.dll
 IF !ERRORLEVEL! NEQ 0 goto error
 
 
