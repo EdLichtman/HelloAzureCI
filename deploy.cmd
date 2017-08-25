@@ -40,15 +40,15 @@ IF NOT DEFINED NEXT_MANIFEST_PATH (
   )
 )
 
-REM IF NOT DEFINED KUDU_SYNC_CMD (
-REM   :: Install kudu sync
-REM   echo Installing Kudu Sync
-REM   call npm install kudusync -g --silent
-REM   IF !ERRORLEVEL! NEQ 0 goto error
+IF NOT DEFINED KUDU_SYNC_CMD (
+  :: Install kudu sync
+  echo Installing Kudu Sync
+  call npm install kudusync -g --silent
+  IF !ERRORLEVEL! NEQ 0 goto error
 
-REM   :: Locally just running "kuduSync" would also work
-REM   SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
-REM )
+  :: Locally just running "kuduSync" would also work
+  SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
+)
 IF NOT DEFINED DEPLOYMENT_TEMP (
   SET DEPLOYMENT_TEMP=%temp%\___deployTemp%random%
   SET CLEAN_LOCAL_DEPLOYMENT_TEMP=true
@@ -88,17 +88,21 @@ IF !ERRORLEVEL! NEQ 0 goto error
 call :ExecuteCmd "%MSBUILD_PATH%" "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\HelloAzureCIUnitTests.csproj
 IF !ERRORLEVEL! NEQ 0 goto error
 
+
 :: 3. Run unit tests
-::call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
-::IF !ERRORLEVEL! NEQ 0 goto error
-:: 3. Run unit tests
+:: 3a. Install NUnit3 Adapter
 Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\RunNUnitTests.ps1"
 
-REM :: 3. KuduSync
-REM IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-REM   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
-REM   IF !ERRORLEVEL! NEQ 0 goto error
-REM )
+:: 3b. Call vstest.console
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
+
+IF !ERRORLEVEL! NEQ 0 goto error
+
+:: 3. KuduSync
+IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
+  call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
+  IF !ERRORLEVEL! NEQ 0 goto error
+)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 goto end
@@ -114,6 +118,12 @@ exit /b %ERRORLEVEL%
 :error
 endlocal
 echo An error has occurred during web site deployment.
+call :exitSetErrorLevel
+call :exitFromFunction 2>nul
+
+:errorRunningTests
+endlocal
+echo An error has occurred while running unit tests.
 call :exitSetErrorLevel
 call :exitFromFunction 2>nul
 
