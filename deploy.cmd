@@ -89,7 +89,7 @@ call :ExecuteCmd "%MSBUILD_PATH%" "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\Hel
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. Run unit tests
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\HelloAzureCIUnitTests\bin\HelloAzureCIUnitTests.dll
 IF !ERRORLEVEL! NEQ 0 goto error
 
 
