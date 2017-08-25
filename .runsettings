@@ -2,6 +2,6 @@
 <RunSettings>  
   <!-- Configurations that affect the Test Framework -->  
   <RunConfiguration>
-    <TestAdaptersPaths>.\HelloAzureCIUnitTests\packages\NUnit3TestAdapter.3.8.0\build\net35</TestAdaptersPaths>
+    <TestAdaptersPaths>%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\packages\NUnit3TestAdapter.3.8.0\build\net35</TestAdaptersPaths>
   </RunConfiguration>
 </RunSettings>
