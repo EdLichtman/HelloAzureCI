@@ -1,9 +1,8 @@
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $UnitTestsDir = "$ProjectDir\HelloAzureCIUnitTests"
 
-$app = Get-AzureRmWebApp -Name ELTestAzureCI
-$appSettings = $app.siteconfig.AppSettings
-$connectionStrings = $app.siteconfig.ConnectionStrings
+$appSettings = $Env: | where-object {$_.Name -contains "APPSETTING"} 
+$connectionStrings = $Env: | where-object {$_.Name -contains "CONNECTIONSTRING"} 
 
 $nameValues = ''
 
