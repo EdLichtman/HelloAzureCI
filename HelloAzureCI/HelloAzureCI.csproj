@@ -243,7 +243,7 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent>if not exist "$(ProjectDir)App_Data" echo D|xcopy /E /Y "$(ProjectDir)Sample_App_Data" "$(ProjectDir)App_Data"
-echo D|xcopy /E /Y "$(ProjectDir)Sample_App_Data" "$(SolutionDir)HelloAzureCIUnitTests\App_Data"</PreBuildEvent>
+echo D|xcopy /E /Y "$(ProjectDir)App_Data" "$(SolutionDir)HelloAzureCIUnitTests\App_Data"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
