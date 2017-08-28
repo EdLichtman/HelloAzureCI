@@ -61,8 +61,12 @@ IF DEFINED MSBUILD_PATH goto MsbuildPathDefined
 SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 :MsbuildPathDefined
 
+SET DeployScriptsDir=%DEPLOYMENT_SOURCE%\DeployScripts
 SET WebApplicationDir=%DEPLOYMENT_SOURCE%\HelloAzureCI
 SET UnitTestsDir=%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests
+SET SlnName=HelloAzureCI
+SET MainCsProjName=%SlnName%
+SET UnitTestsCsProjName=%SlnName%UnitTests
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Deployment
 :: ----------
@@ -70,31 +74,30 @@ SET UnitTestsDir=%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests
 echo Handling .NET Web Application deployment.
 
 :: 0. Restore Environment AppSettings
-echo "%WebApplicationDir%"
-Powershell.exe -executionpolicy remotesigned -File "%WebApplicationDir%\ImportEnvironmentAppSettings.ps1"
+Powershell.exe -executionpolicy remotesigned -File "%DeployScriptsDir%\ImportEnvironmentAppSettings.ps1"
 
 :: 1. Restore NuGet packages
-IF /I "HelloAzureCI.sln" NEQ "" (
-  call :ExecuteCmd nuget restore "%DEPLOYMENT_SOURCE%\HelloAzureCI.sln"
+IF /I "%SlnName%.sln" NEQ "" (
+  call :ExecuteCmd nuget restore "%DEPLOYMENT_SOURCE%\%SlnName%.sln"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
 :: 2. Build to the temporary path
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\HelloAzureCI.csproj" /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:_PackageTempDir="%DEPLOYMENT_TEMP%";AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
+  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\%MainCsProjName%.csproj" /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:_PackageTempDir="%DEPLOYMENT_TEMP%";AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
 ) ELSE (
-  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\HelloAzureCI.csproj" /nologo /verbosity:m /t:Build /p:AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
+  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\%MainCsProjName%.csproj" /nologo /verbosity:m /t:Build /p:AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
 )
 
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2a. Build test project to temporary path
-call :ExecuteCmd "%MSBUILD_PATH%" "%UnitTestsDir%\HelloAzureCIUnitTests.csproj
+call :ExecuteCmd "%MSBUILD_PATH%" "%UnitTestsDir%\%UnitTestsCsProjName%.csproj
 IF !ERRORLEVEL! NEQ 0 goto error
 
 
 :: 3. Run unit tests
-Powershell.exe -executionpolicy remotesigned -Command "& ""%UnitTestsDir%\RunNUnitTests.ps1"""
+Powershell.exe -executionpolicy remotesigned -Command "& ""%DeployScriptsDir%\RunNUnitTests.ps1"""
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync

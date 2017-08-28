@@ -7,14 +7,15 @@ $UnitTestsDir = "$ProjectDir\HelloAzureCIUnitTests"
 $PackagesDir = "$UnitTestsDir\packages"
 $OutDir = "$UnitTestsDir\bin\Debug"
 $nuget = "nuget"
-$framework = "net-4.5"
+$nUnitFramework = "net-4.5"
+$nUnitVersion = "3.7.0"
 
-& $nuget install NUnit.ConsoleRunner -Version 3.7.0 -o $PackagesDir
+& $nuget install NUnit.ConsoleRunner -Version $nUnitVersion -o $PackagesDir
 
-$nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe"
+$nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
 
-$NUnitTestResults = & $nunit $tests --noheader --framework=$framework --work=$OutDir
+$NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
 
 $NUnitOverallResult = "Failed"
 $NUnitTestResults | ForEach-Object {
