@@ -1,10 +1,15 @@
+#Declare Variables for use. Clear the App_Data folder
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $MainApplicationDir = "$ProjectDir\HelloAzureCI"
 
 $appSettings = $Env | where-object {$_.Name -contains "APPSETTING"} 
 $connectionStrings = $Env | where-object {$_.Name -contains "CONNECTIONSTRING"} 
 
-#AppSettings
+Remove-Item -path "$MainApplicationDir\App_Data" -recurse
+New-Item -ItemType Directory -Path "$MainApplicationDir\App_Data"
+
+
+#Create AppSettings.config
 [xml]$appSettingsConfig = New-Object System.Xml.XmlDocument
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $appSettingsNode = $appSettingsConfig.CreateNode("element", "appSettings", $null)
@@ -27,10 +32,13 @@ $appSettingsConfig.AppendChild($appSettingsNode)
 $appSettingsConfig.save("$MainApplicationDir\App_Data\appSettings.config")
 
 
-#ConnectionStrings
+
+
+
+#Create ConnectionStrings.config
 [xml]$connectionStringsConfig = New-Object System.Xml.XmlDocument
 $declaration = $connectionStringsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
-$connectionStringsNode = $appSettingsConfig.CreateNode("element", "connectionStrings", $null)
+$connectionStringsNode = $connectionStringsConfig.CreateNode("element", "connectionStrings", $null)
 
 $connectionStringsConfig.AppendChild($declaration)
 
@@ -54,24 +62,3 @@ $connectionStringsConfig.save("$MainApplicationDir\App_Data\connectionStrings.co
 
 
 
-# $connectionStringValues = ''
-# foreach ($connectionString in $connectionStrings) {
-#     $name = $connectionString.Name
-#     $connection = $connectionString.ConnectionString
-#     $type = $connectionString.Type
-
-#     $connectionStringValues += @"
-#     <add name="$name" connectionString="$connection" />
-
-# "@
-# }
-
-# $connectionStrings =@"
-# <?xml version="1.0" encoding="utf-8" ?>
-# <connectionStrings>
-# $connectionStringValues
-# </connectionStrings>
-# "@
-
-
-#$connectionStrings | out-file -filepath "$MainApplicationDir\App_Data\connectionStrings.config"
