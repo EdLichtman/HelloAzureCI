@@ -94,7 +94,7 @@ IF !ERRORLEVEL! NEQ 0 goto error
 
 
 :: 3. Run unit tests
-Powershell.exe -executionpolicy remotesigned -File "%UnitTestsDir%\RunNUnitTests.ps1"
+Powershell.exe -executionpolicy remotesigned -Command "& ""%UnitTestsDir%\RunNUnitTests.ps1"""
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync
