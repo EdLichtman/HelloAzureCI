@@ -21,9 +21,9 @@ $NUnitTestResults | ForEach-Object {
     $trimmedResult = $_.trim()
     if ($trimmedResult -like "Overall Result*") {
         $NUnitOverallResult = $trimmedResult -replace 'Overall Result: ', ''
-    } 
-    
+    }     
 }
+Write-Output $NUnitTestResults
 if ($NUnitOverallResult -ne "Passed")
 {
     exit 4
