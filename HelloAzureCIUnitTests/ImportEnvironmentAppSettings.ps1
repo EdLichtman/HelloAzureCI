@@ -1,13 +1,16 @@
 
 #Declare Variables for use. Clear the App_Data folder
-write-output Declaring Local Variables and preparing appSettings and connectionStrings
+write-output "Declaring Local Variables and preparing appSettings and connectionStrings"
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $MainApplicationDir = "$ProjectDir\HelloAzureCI"
 
 $appSettings = $Env | where-object {$_.Name -contains "APPSETTING"} 
 $connectionStrings = $Env | where-object {$_.Name -contains "CONNECTIONSTRING"} 
 
-write-output Clearing App_Data Folder
+write-output "Debug Variables: Environment Variables: "
+write-output $env
+
+write-output "Clearing App_Data Folder"
 Remove-Item -path "$MainApplicationDir\App_Data" -recurse
 New-Item -ItemType Directory -Path "$MainApplicationDir\App_Data"
 
@@ -61,7 +64,7 @@ foreach ($connectionString in $connectionStrings) {
 $connectionStringsConfig.AppendChild($connectionStringsNode)
 $connectionStringsConfig.save("$MainApplicationDir\App_Data\connectionStrings.config")
 
-write-output debug values:
+write-output "debug values:"
 write-output "$MainApplicationDir\App_Data"
 write-output $appSettingsConfig
 write-output $connectionStringsConfig
