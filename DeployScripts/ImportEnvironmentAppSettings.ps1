@@ -51,7 +51,6 @@ $connectionStringsConfig.AppendChild($declaration)
 foreach ($connectionString in $connectionStrings) {
     $name = $connectionString.Name -replace 'SQLAZURECONNSTR_', ''
     $connection = $connectionString.Value
-    Write-Host $ConnectionString $Connection $Name
     if ($connection) {
         $keyValuePair = $connectionStringsConfig.CreateNode("element", "add", $null)
         $keyValuePair.SetAttribute("name", $name)
