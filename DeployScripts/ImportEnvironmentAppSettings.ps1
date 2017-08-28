@@ -14,7 +14,6 @@ write-output "Clearing $AppDataFolderName Folder"
 Remove-Item -path "$MainApplicationDir\$AppDataFolderName" -recurse
 New-Item -ItemType Directory -Path "$MainApplicationDir\$AppDataFolderName"
 
-write-Output "Debug AppSettings" $appSettings "Debug ConnectionStrings" $connectionStrings
 #Create AppSettings.config
 [xml]$appSettingsConfig = New-Object System.Xml.XmlDocument
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
@@ -49,11 +48,10 @@ $declaration = $connectionStringsConfig.CreateXmlDeclaration("1.0", "UTF-8",$nul
 $connectionStringsNode = $connectionStringsConfig.CreateNode("element", "connectionStrings", $null)
 
 $connectionStringsConfig.AppendChild($declaration)
-
 foreach ($connectionString in $connectionStrings) {
     $name = $connectionString.Name -replace 'SQLAZURECONNSTR_', ''
-    $connection = $connectionString.ConnectionString
-    $type = $connectionString.Type
+    $connection = $connectionString.Value
+    Write-Host $ConnectionString $Connection $Name
     if ($connection) {
         $keyValuePair = $connectionStringsConfig.CreateNode("element", "add", $null)
         $keyValuePair.SetAttribute("name", $name)
