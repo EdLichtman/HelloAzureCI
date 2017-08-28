@@ -4,8 +4,10 @@ write-output "Declaring Local Variables and preparing appSettings and connection
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $MainApplicationDir = "$ProjectDir\HelloAzureCI"
 
-$appSettings = $Env | where-object {$_.Name -contains "APPSETTING"} 
-$connectionStrings = $Env | where-object {$_.Name -contains "CONNECTIONSTRING"} 
+$EnvironmentVariables = Get-ChildItem Env: 
+
+$appSettings = $EnvironmentVariables | where-object {$_.Name -contains "APPSETTING"} 
+$connectionStrings = $EnvironmentVariables | where-object {$_.Name -contains "SQLAZURECONNSTR"} 
 
 write-output "Debug Variables: Environment Variables: "
 Get-ChildItem Env: 
@@ -23,11 +25,11 @@ $appSettingsNode = $appSettingsConfig.CreateNode("element", "appSettings", $null
 $appSettingsConfig.AppendChild($declaration)
 
 foreach ($appSetting in $appSettings) {
-    $key = $appSetting.Name
+    $key = $appSetting.Name 
     $value = $appSetting.Value
     if ($key) {
         $keyValuePair = $appSettingsConfig.CreateNode("element", "add", $null)
-        $keyValuePair.key = $key
+        $keyValuePair.key = $key -replace 'APPSETTING_', ''
         $keyValuePair.value = $value
         
         $appSettingsNode.AppendChild($keyValuePair)
@@ -54,8 +56,8 @@ foreach ($connectionString in $connectionStrings) {
     $type = $connectionString.Type
     if ($connection) {
         $keyValuePair = $connectionStringsConfig.CreateNode("element", "add", $null)
-        $keyValuePair.key = $key
-        $keyValuePair.value = $value
+        $keyValuePair.key = $name -replace 'SQLAZURECONNSTR_', ''
+        $keyValuePair.value = $connection
         
         $connectionStringsNode.AppendChild($keyValuePair)
     }
