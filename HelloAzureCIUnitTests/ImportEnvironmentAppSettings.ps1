@@ -8,13 +8,6 @@ $EnvironmentVariables = Get-ChildItem Env:
 $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" }
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
-
-
-write-output "Debug Variables: EnvironmentVariables in local variable"
-write-output $appSettings
-write-output $connectionStrings
-
-
 write-output "Clearing App_Data Folder"
 Remove-Item -path "$MainApplicationDir\App_Data" -recurse
 New-Item -ItemType Directory -Path "$MainApplicationDir\App_Data"
@@ -32,7 +25,6 @@ foreach ($appSetting in $appSettings) {
     $value = $appSetting.Value
     if ($key) {
         $keyValuePair = $appSettingsConfig.CreateNode("element", "add", $null)
-        write-host $keyValuePair.getType() $key $value
         $keyValuePair.SetAttribute("key", $key)
         $keyValuePair.SetAttribute("value", $value)
         
@@ -41,6 +33,8 @@ foreach ($appSetting in $appSettings) {
 }
 
 $appSettingsConfig.AppendChild($appSettingsNode)
+
+Write-Output "Saving appSettings to: $MainApplicationDir\App_Data\appSettings.config"
 $appSettingsConfig.save("$MainApplicationDir\App_Data\appSettings.config")
 
 
@@ -68,9 +62,6 @@ foreach ($connectionString in $connectionStrings) {
 }
 
 $connectionStringsConfig.AppendChild($connectionStringsNode)
-$connectionStringsConfig.save("$MainApplicationDir\App_Data\connectionStrings.config")
 
-write-output "debug values:"
-write-output "$MainApplicationDir\App_Data"
-write-output $appSettingsConfig
-write-output $connectionStringsConfig
+Write-Output "Saving connectionStrings to: $MainApplicationDir\App_Data\connectionStrings.config"
+$connectionStringsConfig.save("$MainApplicationDir\App_Data\connectionStrings.config")
