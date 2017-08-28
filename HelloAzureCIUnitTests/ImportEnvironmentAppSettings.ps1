@@ -9,8 +9,10 @@ $EnvironmentVariables = Get-ChildItem Env:
 $appSettings = $EnvironmentVariables | where-object {$_.Name -contains "APPSETTING"} 
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -contains "SQLAZURECONNSTR"} 
 
-write-output "Debug Variables: Environment Variables: "
-Get-ChildItem Env: 
+write-output "Debug Variables: EnvironmentVariables in local variable"
+write-output $EnvironmentVariables
+write-output $appSettings
+write-output $connectionStrings
 
 write-output "Clearing App_Data Folder"
 Remove-Item -path "$MainApplicationDir\App_Data" -recurse
