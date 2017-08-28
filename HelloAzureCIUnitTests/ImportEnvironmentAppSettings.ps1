@@ -8,7 +8,7 @@ $appSettings = $Env | where-object {$_.Name -contains "APPSETTING"}
 $connectionStrings = $Env | where-object {$_.Name -contains "CONNECTIONSTRING"} 
 
 write-output "Debug Variables: Environment Variables: "
-write-output $env
+Get-ChildItem Env: 
 
 write-output "Clearing App_Data Folder"
 Remove-Item -path "$MainApplicationDir\App_Data" -recurse
