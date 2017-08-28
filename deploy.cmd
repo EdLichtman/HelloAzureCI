@@ -95,7 +95,7 @@ IF !ERRORLEVEL! NEQ 0 goto error
 :: 3a. Install NUnit3 Adapter
 Powershell.exe -executionpolicy remotesigned -File "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\InstallNUnit3TestAdapter.ps1"
 :: 3c. Call vstest.console
-call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /TestAdapterPath:"%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\packages\NUnit3TestAdapter.3.8.0\build\net35\NUnit3.TestAdapter.dll"
+call :ExecuteCmd vstest.console.exe "%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\bin\Debug\HelloAzureCIUnitTests.dll" /TestAdapterPath:"%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests\packages\NUnit3TestAdapter.3.8.0\build\net35\NUnit3.TestAdapter"
 
 IF !ERRORLEVEL! NEQ 0 goto error
 
