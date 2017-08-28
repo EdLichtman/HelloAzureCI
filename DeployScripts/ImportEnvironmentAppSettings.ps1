@@ -6,7 +6,7 @@ $MainApplicationDir = "$ProjectDir\HelloAzureCI"
 $AppDataFolderName = "App_Data" 
 
 $EnvironmentVariables = Get-ChildItem Env: 
-Write-Output $EnvironmentVariables
+
 $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" }
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
@@ -14,7 +14,7 @@ write-output "Clearing $AppDataFolderName Folder"
 Remove-Item -path "$MainApplicationDir\$AppDataFolderName" -recurse
 New-Item -ItemType Directory -Path "$MainApplicationDir\$AppDataFolderName"
 
-
+write-Output "Debug AppSettings" $appSettings "Debug ConnectionStrings" $connectionStrings
 #Create AppSettings.config
 [xml]$appSettingsConfig = New-Object System.Xml.XmlDocument
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
