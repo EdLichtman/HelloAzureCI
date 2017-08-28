@@ -1,3 +1,7 @@
+
+
+
+
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $UnitTestsDir = "$ProjectDir\HelloAzureCIUnitTests"
 $PackagesDir = "$UnitTestsDir\packages"
@@ -9,11 +13,18 @@ $framework = "net-4.5"
 
 $nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe"
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
-try {
-    & $nunit $tests --noheader --framework=$framework --work=$OutDir
-    write-output HelloWorld
-} Catch {
-    write-output HelloWorldIMadeItToTheCatch
+
+$NUnitTestResults = & $nunit $tests --noheader --framework=$framework --work=$OutDir
+
+$NUnitOverallResult = "Failed"
+$NUnitTestResults | ForEach-Object {
+    $trimmedResult = $_.trim()
+    if ($trimmedResult -like "Overall Result*") {
+        $NUnitOverallResult = $trimmedResult -replace 'Overall Result: ', ''
+    } 
+    
+}
+if ($NUnitOverallResult -ne "Passed")
+{
     exit 4
 }
-write-output HelloWorldIPassedTheTry
