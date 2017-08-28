@@ -57,7 +57,7 @@ foreach ($connectionString in $connectionStrings) {
     if ($connection) {
         $keyValuePair = $connectionStringsConfig.CreateNode("element", "add", $null)
         $keyValuePair.SetAttribute("name", $name)
-        $keyValuePair.SetAttribute("connection", $connection)
+        $keyValuePair.SetAttribute("connectionString", $connection)
         
         $connectionStringsNode.AppendChild($keyValuePair)
     }

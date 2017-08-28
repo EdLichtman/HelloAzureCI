@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace HelloAzureCIUnitTests
 {
     [TestFixture]
-    public class ConfigurationSettings
+    public class AppSettings
     {
 
         [Test]
