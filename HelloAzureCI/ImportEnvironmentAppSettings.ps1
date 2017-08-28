@@ -2,15 +2,17 @@
 write-output "Declaring Local Variables and preparing appSettings and connectionStrings"
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $MainApplicationDir = "$ProjectDir\HelloAzureCI"
+#Define folder in which you want to store various runtime config
+$AppDataFolderName = "App_Data" 
 
 $EnvironmentVariables = Get-ChildItem Env: 
 
 $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" }
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
-write-output "Clearing App_Data Folder"
-Remove-Item -path "$MainApplicationDir\App_Data" -recurse
-New-Item -ItemType Directory -Path "$MainApplicationDir\App_Data"
+write-output "Clearing $AppDataFolderName Folder"
+Remove-Item -path "$MainApplicationDir\$AppDataFolderName" -recurse
+New-Item -ItemType Directory -Path "$MainApplicationDir\$AppDataFolderName"
 
 
 #Create AppSettings.config
@@ -34,8 +36,8 @@ foreach ($appSetting in $appSettings) {
 
 $appSettingsConfig.AppendChild($appSettingsNode)
 
-Write-Output "Saving appSettings to: $MainApplicationDir\App_Data\appSettings.config"
-$appSettingsConfig.save("$MainApplicationDir\App_Data\appSettings.config")
+Write-Output "Saving appSettings to: $MainApplicationDir\$AppDataFolderName\appSettings.config"
+$appSettingsConfig.save("$MainApplicationDir\$AppDataFolderName\appSettings.config")
 
 
 
@@ -63,5 +65,5 @@ foreach ($connectionString in $connectionStrings) {
 
 $connectionStringsConfig.AppendChild($connectionStringsNode)
 
-Write-Output "Saving connectionStrings to: $MainApplicationDir\App_Data\connectionStrings.config"
-$connectionStringsConfig.save("$MainApplicationDir\App_Data\connectionStrings.config")
+Write-Output "Saving connectionStrings to: $MainApplicationDir\$AppDataFolderName\connectionStrings.config"
+$connectionStringsConfig.save("$MainApplicationDir\$AppDataFolderName\connectionStrings.config")
