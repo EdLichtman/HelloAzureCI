@@ -11,6 +11,9 @@ $nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.ex
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
 try {
     & $nunit $tests --noheader --framework=$framework --work=$OutDir
+    write-output HelloWorld
 } Catch {
+    write-output HelloWorldIMadeItToTheCatch
     exit 4
 }
+write-output HelloWorldIPassedTheTry
