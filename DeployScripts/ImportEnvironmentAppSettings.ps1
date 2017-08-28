@@ -6,7 +6,7 @@ $MainApplicationDir = "$ProjectDir\HelloAzureCI"
 $AppDataFolderName = "App_Data" 
 
 $EnvironmentVariables = Get-ChildItem Env: 
-
+Write-Output $EnvironmentVariables
 $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" }
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
