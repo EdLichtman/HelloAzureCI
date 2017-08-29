@@ -1,9 +1,5 @@
-
-
-
-
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
-$UnitTestsDir = "$ProjectDir\HelloAzureCIUnitTests"
+$UnitTestsDir = "$Env:CurrentUnitTestBeingTested"
 $PackagesDir = "$UnitTestsDir\packages"
 $OutDir = "$UnitTestsDir\bin\Debug"
 $nuget = "nuget"
@@ -29,3 +25,4 @@ if ($NUnitOverallResult -ne "Passed")
 {
     exit 4
 }
+exit 0

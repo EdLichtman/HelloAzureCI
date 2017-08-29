@@ -1,9 +1,10 @@
 #Declare Variables for use. Clear the App_Data folder
 write-output "Declaring Local Variables and preparing appSettings and connectionStrings"
-$ProjectDir = $Env:DEPLOYMENT_SOURCE
-$MainApplicationDir = "$ProjectDir\HelloAzureCI"
+$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
+$MainProjectDir = $Env:MAIN_PROJECT_DIR
 #Define folder in which you want to store various runtime config
-$AppDataFolderName = "App_Data" 
+$AppDataFolderName = (Get-ChildItem -Path $MainProjectDir).Where({$_.Name -like "Sample_*"}).Name.Replace("Sample_", "")
+
 
 $EnvironmentVariables = Get-ChildItem Env: 
 
@@ -11,8 +12,8 @@ $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
 write-output "Clearing $AppDataFolderName Folder"
-Remove-Item -path "$MainApplicationDir\$AppDataFolderName" -recurse
-New-Item -ItemType Directory -Path "$MainApplicationDir\$AppDataFolderName"
+Remove-Item -path "$MainProjectDir\$AppDataFolderName" -recurse
+New-Item -ItemType Directory -Path "$MainProjectDir\$AppDataFolderName"
 
 #Create AppSettings.config
 [xml]$appSettingsConfig = New-Object System.Xml.XmlDocument
@@ -35,8 +36,8 @@ foreach ($appSetting in $appSettings) {
 
 $appSettingsConfig.AppendChild($appSettingsNode)
 
-Write-Output "Saving appSettings to: $MainApplicationDir\$AppDataFolderName\appSettings.config"
-$appSettingsConfig.save("$MainApplicationDir\$AppDataFolderName\appSettings.config")
+Write-Output "Saving appSettings to: $MainProjectDir\$AppDataFolderName\appSettings.config"
+$appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config")
 
 
 
@@ -62,5 +63,5 @@ foreach ($connectionString in $connectionStrings) {
 
 $connectionStringsConfig.AppendChild($connectionStringsNode)
 
-Write-Output "Saving connectionStrings to: $MainApplicationDir\$AppDataFolderName\connectionStrings.config"
-$connectionStringsConfig.save("$MainApplicationDir\$AppDataFolderName\connectionStrings.config")
+Write-Output "Saving connectionStrings to: $MainProjectDir\$AppDataFolderName\connectionStrings.config"
+$connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config")

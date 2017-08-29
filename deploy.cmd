@@ -38,15 +38,15 @@ IF NOT DEFINED NEXT_MANIFEST_PATH (
   )
 )
 
-REM IF NOT DEFINED KUDU_SYNC_CMD (
-REM   :: Install kudu sync
-REM   echo Installing Kudu Sync
-REM   call npm install kudusync -g --silent
-REM   IF !ERRORLEVEL! NEQ 0 goto error
+IF NOT DEFINED KUDU_SYNC_CMD (
+  :: Install kudu sync
+  echo Installing Kudu Sync
+  call npm install kudusync -g --silent
+  IF !ERRORLEVEL! NEQ 0 goto error
 
-REM   :: Locally just running "kuduSync" would also work
-REM   SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
-REM )
+  :: Locally just running "kuduSync" would also work
+  SET KUDU_SYNC_CMD=%appdata%\npm\kuduSync.cmd
+)
 IF NOT DEFINED DEPLOYMENT_TEMP (
   SET DEPLOYMENT_TEMP=%temp%\___deployTemp%random%
   SET CLEAN_LOCAL_DEPLOYMENT_TEMP=true
@@ -62,11 +62,8 @@ SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 :MsbuildPathDefined
 
 SET DeployScriptsDir=%DEPLOYMENT_SOURCE%\DeployScripts
-SET WebApplicationDir=%DEPLOYMENT_SOURCE%\HelloAzureCI
-SET UnitTestsDir=%DEPLOYMENT_SOURCE%\HelloAzureCIUnitTests
-SET SlnName=HelloAzureCI
-SET MainCsProjName=%SlnName%
-SET UnitTestsCsProjName=%SlnName%UnitTests
+
+SET MAIN_PROJECT_DIR=%DEPLOYMENT_SOURCE%\HelloAzureCI
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Deployment
 :: ----------
@@ -77,34 +74,22 @@ echo Handling .NET Web Application deployment.
 Powershell.exe -executionpolicy remotesigned -File "%DeployScriptsDir%\ImportEnvironmentAppSettings.ps1"
 
 :: 1. Restore NuGet packages
-IF /I "%SlnName%.sln" NEQ "" (
-  call :ExecuteCmd nuget restore "%DEPLOYMENT_SOURCE%\%SlnName%.sln"
-  IF !ERRORLEVEL! NEQ 0 goto error
-)
+Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\RestoreNugetPackages.ps1""""} catch {exit 1}"
+IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
-IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\%MainCsProjName%.csproj" /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:_PackageTempDir="%DEPLOYMENT_TEMP%";AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
-) ELSE (
-  call :ExecuteCmd "%MSBUILD_PATH%" "%WebApplicationDir%\%MainCsProjName%.csproj" /nologo /verbosity:m /t:Build /p:AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false /p:SolutionDir="%DEPLOYMENT_SOURCE%\.\\" %SCM_BUILD_ARGS%
-)
-
+Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\BuildSolution.ps1""""} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2a. Build test project to temporary path
-call :ExecuteCmd "%MSBUILD_PATH%" "%UnitTestsDir%\%UnitTestsCsProjName%.csproj
+Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1""""} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
-
-:: 3. Run unit tests
-Powershell.exe -executionpolicy remotesigned -Command "& ""%DeployScriptsDir%\RunNUnitTests.ps1"""
-IF !ERRORLEVEL! NEQ 0 goto error
-
-REM :: 3. KuduSync
-REM IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-REM   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
-REM   IF !ERRORLEVEL! NEQ 0 goto error
-REM )
+:: 3. KuduSync
+IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
+  call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_TEMP%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
+  IF !ERRORLEVEL! NEQ 0 goto error
+)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 goto end
