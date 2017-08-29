@@ -12,15 +12,14 @@ $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
 write-output "Clearing $AppDataFolderName Folder"
-Remove-Item -path "$MainProjectDir\$AppDataFolderName" -recurse
-New-Item -ItemType Directory -Path "$MainProjectDir\$AppDataFolderName"
+Remove-Item -path "$MainProjectDir\$AppDataFolderName" -recurse | Out-Null
+New-Item -ItemType Directory -Path "$MainProjectDir\$AppDataFolderName" | Out-Null
 
 #Create AppSettings.config
-[xml]$appSettingsConfig = New-Object System.Xml.XmlDocument
+[xml]$appSettingsConfig = New-Object System.Xml.XmlDocument 
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $appSettingsNode = $appSettingsConfig.CreateNode("element", "appSettings", $null)
-
-$appSettingsConfig.AppendChild($declaration)
+$appSettingsConfig.AppendChild($declaration) | Out-Null
 
 foreach ($appSetting in $appSettings) {
     $key = $appSetting.Name -replace 'APPSETTING_', ''
@@ -34,10 +33,10 @@ foreach ($appSetting in $appSettings) {
     }
 }
 
-$appSettingsConfig.AppendChild($appSettingsNode)
+$appSettingsConfig.AppendChild($appSettingsNode) | Out-Null
 
 Write-Output "Saving appSettings to: $MainProjectDir\$AppDataFolderName\appSettings.config"
-$appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config")
+$appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config") | Out-Null
 
 
 
@@ -48,7 +47,8 @@ $appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config")
 $declaration = $connectionStringsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $connectionStringsNode = $connectionStringsConfig.CreateNode("element", "connectionStrings", $null)
 
-$connectionStringsConfig.AppendChild($declaration)
+$connectionStringsConfig.AppendChild($declaration) | Out-Null
+
 foreach ($connectionString in $connectionStrings) {
     $name = $connectionString.Name -replace 'SQLAZURECONNSTR_', ''
     $connection = $connectionString.Value
@@ -61,7 +61,7 @@ foreach ($connectionString in $connectionStrings) {
     }
 }
 
-$connectionStringsConfig.AppendChild($connectionStringsNode)
+$connectionStringsConfig.AppendChild($connectionStringsNode) | Out-Null
 
 Write-Output "Saving connectionStrings to: $MainProjectDir\$AppDataFolderName\connectionStrings.config"
-$connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config")
+$connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config") | Out-Null
