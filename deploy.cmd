@@ -74,7 +74,7 @@ echo Handling .NET Web Application deployment.
 Powershell.exe -executionpolicy remotesigned -File "%DeployScriptsDir%\ImportEnvironmentAppSettings.ps1"
 
 :: 1. Restore NuGet packages
-Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\RestoreNugetPackages.ps1""""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\RestoreNugetPackages.ps1""} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
