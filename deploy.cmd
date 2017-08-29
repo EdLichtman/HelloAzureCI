@@ -74,15 +74,15 @@ echo Handling .NET Web Application deployment.
 Powershell.exe -executionpolicy remotesigned -File "%DeployScriptsDir%\ImportEnvironmentAppSettings.ps1"
 
 :: 1. Restore NuGet packages
-Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\RestoreNugetPackages.ps1""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & '$Env:DeployScriptsDir\RestoreNugetPackages.ps1'} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\BuildSolution.ps1""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & '$Env:DeployScriptsDir\BuildSolution.ps1'} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2a. Build test project to temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & '%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1'} catch {Write-Output Error Occurred!!!!;exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync
