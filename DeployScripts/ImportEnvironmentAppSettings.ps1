@@ -65,3 +65,6 @@ $connectionStringsConfig.AppendChild($connectionStringsNode) | Out-Null
 
 Write-Output "Saving connectionStrings to: $MainProjectDir\$AppDataFolderName\connectionStrings.config"
 $connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config") | Out-Null
+
+& more "$MainProjectDir\$AppDataFolderName\appSettings.config"
+& more "$MainProjectDir\$AppDataFolderName\connectionStrings.config"
