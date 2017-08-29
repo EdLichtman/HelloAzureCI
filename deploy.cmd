@@ -78,11 +78,11 @@ Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsD
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\BuildSolution.ps1""""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\BuildSolution.ps1""} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2a. Build test project to temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & """"%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1""""} catch {exit 1}"
+Powershell.exe -executionpolicy remotesigned -Command "try { & ""%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1""} catch {exit 1}"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync
