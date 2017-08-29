@@ -28,7 +28,7 @@ foreach ($appSetting in $appSettings) {
         $keyValuePair = $appSettingsConfig.CreateNode("element", "add", $null)
         $keyValuePair.SetAttribute("key", $key)
         $keyValuePair.SetAttribute("value", $value)
-        
+        write-output line31
         $appSettingsNode.AppendChild($keyValuePair)
     }
 }
