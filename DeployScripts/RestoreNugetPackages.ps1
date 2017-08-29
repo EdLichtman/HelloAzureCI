@@ -3,14 +3,17 @@ $MainSolutionDir = $Env:DEPLOYMENT_SOURCE
 $AllSolutionFiles = Get-ChildItem -path "$MainSolutionDir" -recurse -Include *.sln
 foreach ($SolutionFile in $AllSolutionFiles) {
     $SolutionFileExecutablePath = $SolutionFile.FullName
-    write-output "& nuget restore $SolutionFileExecutablePath"
-    try {
-        $NugetRestoreCommand = 'nuget restore "{0}"' -f $SolutionFileExecutablePath
-        Start-Process $MainSolutionDir\DeployScripts\RunCommandAsSeparateProcess.cmd $NugetRestoreCommand
-    }catch{ 
-        try {
-            write-output $_.Exception|format-list -force
-            } catch {Write-Output "there is a serious glitch in the matrix"}
+    Start-Job -Name RunNugetCommand -Scriptblock {param($SolutionFileExecutablePath)
+        & nuget restore "$SolutionFileExecutablePath" 2>&1 | Out-Null
+        write-output $lastExitCode
+    } -Arg "$SolutionFileExecutablePath"
+    $ErrorLevel = Get-Job -Name RunNugetCommand | Wait-Job | Receive-Job
+
+    write-output "Recieving Job"
+    write-output $ErrorLevel
+    if ($ErrorLevel -ne 0) { 
+        write-output "exiting with error "$ErrorLevel
+        throw $ErrorLevel
     }
+
 }
-exit 4
