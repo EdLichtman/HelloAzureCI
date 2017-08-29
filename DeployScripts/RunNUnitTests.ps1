@@ -1,3 +1,4 @@
+Write-Output "Hello World I am running Unit Tests"
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
 $UnitTestsDir = "$Env:CurrentUnitTestBeingTested"
 $PackagesDir = "$UnitTestsDir\packages"
