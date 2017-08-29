@@ -8,7 +8,7 @@ foreach ($SolutionFile in $AllSolutionFiles) {
      #   write-output $lastExitCode
      $ErrorLevel = $lastExitCode
     #} -Arg "$SolutionFileExecutablePath"
-    $ErrorLevel = Get-Job -Name RunNugetCommand | Wait-Job | Receive-Job
+    #$ErrorLevel = Get-Job -Name RunNugetCommand | Wait-Job | Receive-Job
 
     write-output "Recieving Job"
     write-output $ErrorLevel
