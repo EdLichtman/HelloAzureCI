@@ -36,7 +36,8 @@ foreach ($appSetting in $appSettings) {
 $appSettingsConfig.AppendChild($appSettingsNode) | Out-Null
 
 Write-Output "Saving appSettings to: $MainProjectDir\$AppDataFolderName\appSettings.config"
-$appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config") | Out-Null
+$appSettingsConfig.save("$MainProjectDir\$AppDataFolderName\appSettings.config") 
+# other form of out-null >$null
 
 
 
@@ -64,4 +65,4 @@ foreach ($connectionString in $connectionStrings) {
 $connectionStringsConfig.AppendChild($connectionStringsNode) | Out-Null
 
 Write-Output "Saving connectionStrings to: $MainProjectDir\$AppDataFolderName\connectionStrings.config"
-$connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config") | Out-Null
+$connectionStringsConfig.save("$MainProjectDir\$AppDataFolderName\connectionStrings.config")
