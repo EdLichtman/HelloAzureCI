@@ -4,5 +4,5 @@ $AllSolutionFiles = Get-ChildItem -path "$MainSolutionDir" -recurse -Include *.s
 foreach ($SolutionFile in $AllSolutionFiles) {
     $SolutionFileExecutablePath = $SolutionFile.FullName
     write-output "& nuget restore $SolutionFileExecutablePath"
-    & nuget restore $SolutionFileExecutablePath
+    try {& nuget restore $SolutionFileExecutablePath}catch{write-output $error}
 }
