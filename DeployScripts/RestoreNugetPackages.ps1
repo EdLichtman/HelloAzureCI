@@ -4,5 +4,12 @@ $AllSolutionFiles = Get-ChildItem -path "$MainSolutionDir" -recurse -Include *.s
 foreach ($SolutionFile in $AllSolutionFiles) {
     $SolutionFileExecutablePath = $SolutionFile.FullName
     write-output "& nuget restore $SolutionFileExecutablePath"
-    try {& nuget restore $SolutionFileExecutablePath}catch{write-output $_.Exception.Message}
+    try {
+        & nuget restore $SolutionFileExecutablePath
+    }catch{ 
+        try {
+            write-output $_.Exception|format-list -force
+            } catch {Write-Output "there is a serious glitch in the matrix"}
+    }
 }
+exit 4
