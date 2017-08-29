@@ -75,7 +75,9 @@ Call:RunPowershellScript ImportEnvironmentAppSettings
 IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Importing App Settings from Environment" & goto:error 
 
 :: 1. Restore NuGet packages
+echo off
 Call:RunPowershellScript RestoreNugetPackages
+echo on
 IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Restoring NugetPackages" & goto:error 
 
 :: 2. Build to the temporary path
