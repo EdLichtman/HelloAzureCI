@@ -72,22 +72,18 @@ echo Handling .NET Web Application deployment.
 
 :: 0. Restore Environment AppSettings
 Call:RunPowershellScript ImportEnvironmentAppSettings
-Echo "Error Importing App Settings from Environment"
-IF !ERRORLEVEL! NEQ 0 goto error
+IF !ERRORLEVEL! NEQ 0 goto error "Error Importing App Settings from Environment"
 
 :: 1. Restore NuGet packages
 Call:RunPowershellScript RestoreNugetPackages
-Echo "Error Restoring NugetPackages"
-IF !ERRORLEVEL! NEQ 0 goto error
+IF !ERRORLEVEL! NEQ 0 goto error "Error Restoring NugetPackages"
 
 :: 2. Build to the temporary path
 Call:RunPowershellScript BuildAllSpecifiedProjects
-Echo "Error Building Specified Projects"
-IF !ERRORLEVEL! NEQ 0 goto error
+IF !ERRORLEVEL! NEQ 0 goto error "Error Building Specified Projects"
 
 Call:RunPowershellScript BuildAndRunAllUnitTests
-Echo "Error Building or Running Unit Tests"
-IF !ERRORLEVEL! NEQ 0 goto error
+IF !ERRORLEVEL! NEQ 0 goto error "Error Building or Running Unit Tests"
 
 :: 3. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
@@ -107,14 +103,9 @@ if "%ERRORLEVEL%" NEQ "0" echo Failed exitCode=%ERRORLEVEL%, command=%_CMD_%
 exit /b %ERRORLEVEL%
 
 :error
+echo %~1
 endlocal
 echo An error has occurred during web site deployment.
-call :exitSetErrorLevel
-call :exitFromFunction 2>nul
-
-:errorRunningTests
-endlocal
-echo An error has occurred while running unit tests.
 call :exitSetErrorLevel
 call :exitFromFunction 2>nul
 
