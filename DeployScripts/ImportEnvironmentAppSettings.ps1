@@ -20,7 +20,7 @@ New-Item -ItemType Directory -Path "$MainProjectDir\$AppDataFolderName" | Out-Nu
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $appSettingsNode = $appSettingsConfig.CreateNode("element", "appSettings", $null)
 $appSettingsConfig.AppendChild($declaration) | Out-Null
-
+Write-Output Line23
 foreach ($appSetting in $appSettings) {
     $key = $appSetting.Name -replace 'APPSETTING_', ''
     $value = $appSetting.Value
