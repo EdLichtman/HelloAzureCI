@@ -35,6 +35,7 @@ foreach ($CurrentUnitTestFolder in $UnitTestPaths) {
         }
     & "$MSBuild_Path" $arguments
     & "$Env:DeployScriptsDir\RunNUnitTests.ps1"
+    
     if ($lastexitcode -ne 0) {
         exit $lastexitcode
     }

@@ -72,18 +72,18 @@ echo Handling .NET Web Application deployment.
 
 :: 0. Restore Environment AppSettings
 Call:RunPowershellScript ImportEnvironmentAppSettings
-IF !ERRORLEVEL! NEQ 0 goto error "Error Importing App Settings from Environment"
+IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Importing App Settings from Environment" & goto:error 
 
 :: 1. Restore NuGet packages
 Call:RunPowershellScript RestoreNugetPackages
-IF !ERRORLEVEL! NEQ 0 goto error "Error Restoring NugetPackages"
+IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Restoring NugetPackages" & goto:error 
 
 :: 2. Build to the temporary path
 Call:RunPowershellScript BuildAllSpecifiedProjects
-IF !ERRORLEVEL! NEQ 0 goto error "Error Building Specified Projects"
+IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Building Specified Projects" & goto:error 
 
 Call:RunPowershellScript BuildAndRunAllUnitTests
-IF !ERRORLEVEL! NEQ 0 goto error "Error Building or Running Unit Tests"
+IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Building or Running Unit Tests" & goto:error 
 
 :: 3. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
@@ -94,6 +94,13 @@ IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 goto end
 
+:RunPowershellScript
+SET PowerShellScript="%DeployScriptsDir%\%~1.ps1"
+echo %PowerShellScript%
+Powershell.exe -executionpolicy remotesigned -Command "try { & """%PowerShellScript%""" } catch {exit 1}"
+exit /b %ERRORLEVEL%
+
+
 :: Execute command routine that will echo out when error
 :ExecuteCmd
 setlocal
@@ -103,9 +110,9 @@ if "%ERRORLEVEL%" NEQ "0" echo Failed exitCode=%ERRORLEVEL%, command=%_CMD_%
 exit /b %ERRORLEVEL%
 
 :error
-echo %~1
+echo %ERRORMESSAGE%
 endlocal
-echo An error has occurred during web site deployment.
+echo "An error has occurred during web site deployment."
 call :exitSetErrorLevel
 call :exitFromFunction 2>nul
 
@@ -118,6 +125,3 @@ exit /b 1
 :end
 endlocal
 echo Finished successfully.
-
-:RunPowershellScript
-Powershell.exe -executionpolicy remotesigned -Command try { "& '"%DeployScriptsDir%"\\"%~1".ps1'" } catch {exit 1}
