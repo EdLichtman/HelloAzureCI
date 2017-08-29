@@ -1,15 +1,7 @@
-function NugetRestore-Solution {
-    param ([string] $SolutionExecutablePath)
-    Start-Job -Name RunNugetCommand -Scriptblock {param($sln)
-        & nuget restore "$sln" 2>&1 | Out-Null
-        write-output $lastExitCode
-    } -Arg "$SolutionExecutablePath" | Out-Null
-    $ErrorLevel = Get-Job -Name RunNugetCommand | Wait-Job | Receive-Job 
-
-    return $ErrorLevel
-}
 
 $MainSolutionDir = $Env:DEPLOYMENT_SOURCE
+. "$MainSolutionDir\DeployScripts\NugetFunctions.ps1"
+
 
 $AllSolutionFiles = Get-ChildItem -path "$MainSolutionDir" -recurse -Include *.sln
 foreach ($SolutionFile in $AllSolutionFiles) {

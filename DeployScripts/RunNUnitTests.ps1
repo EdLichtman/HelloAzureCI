@@ -1,14 +1,16 @@
-
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
-$UnitTestsDir = "$Env:CurrentUnitTestBeingTested"
-$PackagesDir = "$UnitTestsDir\packages"
-$OutDir = "$UnitTestsDir\bin\Debug"
-$nuget = "nuget"
-$nUnitFramework = "net-4.5"
-$nUnitVersion = "3.7.0"
-Write-Output "Line 9 of RunNUnitTests"
-& $nuget install NUnit.ConsoleRunner -Version $nUnitVersion -o $PackagesDir
 
+. "$ProjectDir\DeployScripts\NugetFunctions.ps1"
+
+$UnitTestsDir = "$Env:CurrentUnitTestBeingTested"
+$OutDir = "$UnitTestsDir\bin\Debug"
+$nUnitFramework = "net-4.5"
+$PackagesDir = "$UnitTestsDir\packages"
+$nUnitVersion = "3.7.0"
+
+NugetInstall-Package "NUnit.ConsoleRunner" $nUnitVersion $PackagesDir
+
+Write-Output "Line 11"
 & more "$UnitTestsDir\App_Data\appSettings.config"
 & more "$UnitTestsDir\App_Data\connectionStrings.config"
 
