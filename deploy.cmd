@@ -72,18 +72,21 @@ echo Handling .NET Web Application deployment.
 
 :: 0. Restore Environment AppSettings
 Call:RunPowershellScript ImportEnvironmentAppSettings
-
+Echo "Error Importing App Settings from Environment"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 1. Restore NuGet packages
 Call:RunPowershellScript RestoreNugetPackages
+Echo "Error Restoring NugetPackages"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
-Call:RunPowershellScript BuildAllSolutions
+Call:RunPowershellScript BuildAllSpecifiedProjects
+Echo "Error Building Specified Projects"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 Call:RunPowershellScript BuildAndRunAllUnitTests
+Echo "Error Building or Running Unit Tests"
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync
