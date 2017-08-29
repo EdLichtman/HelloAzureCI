@@ -5,7 +5,8 @@ foreach ($SolutionFile in $AllSolutionFiles) {
     $SolutionFileExecutablePath = $SolutionFile.FullName
     write-output "& nuget restore $SolutionFileExecutablePath"
     try {
-        Start-Process nuget restore $SolutionFileExecutablePath
+        $NugetRestoreCommand = 'nuget restore "{0}"' -f $SolutionFileExecutablePath
+        Start-Process $MainSolutionDir\DeployScripts\RunCommandAsSeparateProcess.cmd $NugetRestoreCommand
     }catch{ 
         try {
             write-output $_.Exception|format-list -force
