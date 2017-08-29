@@ -71,18 +71,19 @@ SET MAIN_PROJECT_DIR=%DEPLOYMENT_SOURCE%\HelloAzureCI
 echo Handling .NET Web Application deployment.
 
 :: 0. Restore Environment AppSettings
-Powershell.exe -executionpolicy remotesigned -File "%DeployScriptsDir%\ImportEnvironmentAppSettings.ps1"
+Call:RunPowershellScript ImportEnvironmentAppSettings
+
+IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 1. Restore NuGet packages
-Powershell.exe -executionpolicy remotesigned -Command "try { & '$Env:DeployScriptsDir\RestoreNugetPackages.ps1'} catch {exit 1}"
+Call:RunPowershellScript RestoreNugetPackages
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 2. Build to the temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & '$Env:DeployScriptsDir\BuildSolution.ps1'} catch {exit 1}"
+Call:RunPowershellScript BuildAllSolutions
 IF !ERRORLEVEL! NEQ 0 goto error
 
-:: 2a. Build test project to temporary path
-Powershell.exe -executionpolicy remotesigned -Command "try { & '%DeployScriptsDir%\BuildAndRunAllUnitTests.ps1'} catch {Write-Output Error Occurred!!!!;exit 1}"
+Call:RunPowershellScript BuildAndRunAllUnitTests
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 3. KuduSync
@@ -123,3 +124,6 @@ exit /b 1
 :end
 endlocal
 echo Finished successfully.
+
+:RunPowershellScript
+Powershell.exe -executionpolicy remotesigned -Command try { "& '"%DeployScriptsDir%"\\"%~1".ps1'" } catch {exit 1}
