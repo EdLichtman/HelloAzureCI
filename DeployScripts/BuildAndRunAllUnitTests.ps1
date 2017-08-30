@@ -8,7 +8,7 @@ $UnitTestPaths = Get-ChildItem -Path $MainSolutionDir | Where-Object {$_.Name -L
 foreach ($CurrentUnitTestFolder in $UnitTestPaths) {
     $UnitTestFolderPath = $CurrentUnitTestFolder.FullName
     $UnitTestProject = Get-ChildItem -Path "$UnitTestFolderPath" | Where-Object {$_.Name -Like "*.csproj"}
-    $UnitTestProjectFile = "$MainSolutionDir\$($UnitTestProject.Name)"
+    $UnitTestProjectFile = $UnitTestProject.FullName
 
     $Env:CurrentUnitTestBeingTested = $UnitTestFolderPath
     if ($InPlaceDeployment -ne "1") {
@@ -33,6 +33,7 @@ foreach ($CurrentUnitTestFolder in $UnitTestPaths) {
 
             )
         }
+    Write-Output "Running: & "$MSBuild_Path" $arguments" 
     & "$MSBuild_Path" $arguments
     & "$Env:DeployScriptsDir\RunNUnitTests.ps1"
     
