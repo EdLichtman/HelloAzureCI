@@ -1,13 +1,16 @@
+$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
+$CurrentProjectLocation = $Env:CURRENT_PROJECT_LOCATION
+$CurrentProjectDirectory = "$MainSolutionDir\$CurrentProjectLocation"
+
 $MSBuild_Path = $Env:MSBUILD_PATH
 $InPlaceDeployment = $Env:IN_PLACE_DEPLOYMENT
 
-$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
-$MainProjectDir = $Env:MAIN_PROJECT_DIR
+Write-Output "`n----- Building $CurrentProjectLocation-----"
 
-$MainProjectCsProjFile = (Get-ChildItem -Path "$MainProjectDir").Where({$_.Name -Like "*.csproj"}).FullName
-
+$Current_csproj_File = (Get-ChildItem -Path "$CurrentProjectDirectory").Where({$_.Name -Like "*.csproj"}).FullName
+Write-Output $Current_csproj_File
 if ($InPlaceDeployment -ne "1") {
-        $arguments = @("$MainProjectCsProjFile"
+        $arguments = @("$Current_csproj_File"
                         ,"/nologo"
                         ,"/verbosity:m" 
                         ,"/t:Build" 
@@ -18,7 +21,7 @@ if ($InPlaceDeployment -ne "1") {
 
     } else {
         $arguments = @(
-            "$MainProjectCsProjFile"
+            "$Current_csproj_File"
             ,"/nologo"
             ,"/verbosity:m"
             ,"/t:Build"
@@ -30,5 +33,5 @@ if ($InPlaceDeployment -ne "1") {
     }
 & "$MSBuild_Path" $arguments
 if ($lastexitcode -ne 0) {
-    exit $lastexitcode
+    throw "Could not build $CurrentProjectDirectory"
 }

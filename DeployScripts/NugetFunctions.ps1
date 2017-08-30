@@ -17,7 +17,6 @@ function NugetInstall-Package {
             )
     Start-Job -Name RunNugetCommand -Scriptblock {param($sln)
         & nuget install $PackageName -Version $nUnitVersionNumber -o $PackagesDirectory 2>&1 | Out-Null
-        write-output $lastExitCode
     } -Arg "$SolutionExecutablePath" | Out-Null
     $ErrorLevel = Get-Job -Name RunNugetCommand | Wait-Job | Receive-Job 
 

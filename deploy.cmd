@@ -63,27 +63,15 @@ SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 
 SET DeployScriptsDir=%DEPLOYMENT_SOURCE%\DeployScripts
 
-SET MAIN_PROJECT_DIR=%DEPLOYMENT_SOURCE%\HelloAzureCI
+SET CURRENT_PROJECT_LOCATION=HelloAzureCI
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Deployment
 :: ----------
 
 echo Handling .NET Web Application deployment.
 
-:: 0. Restore Environment AppSettings
-Call:RunPowershellScript ImportEnvironmentAppSettings
-IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Importing App Settings from Environment" & goto:error 
-
-:: 1. Restore NuGet packages
-Call:RunPowershellScript RestoreNugetPackages
-IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Restoring NugetPackages" & goto:error 
-
-:: 2. Build to the temporary path
-Call:RunPowershellScript BuildAllSpecifiedProjects
-IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Building Specified Projects" & goto:error 
-
-Call:RunPowershellScript BuildAndRunAllUnitTests
-IF !ERRORLEVEL! NEQ 0 SET ERRORMESSAGE="Error Building or Running Unit Tests" & goto:error 
+Call:RunPowershellScript Deploy
+IF !ERRORLEVEL! NEQ 0 goto:error 
 
 :: 3. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
@@ -99,7 +87,6 @@ SET PowerShellScript="%DeployScriptsDir%\%~1.ps1"
 Powershell.exe -executionpolicy remotesigned -Command "try { & """%PowerShellScript%""" } catch {exit 1}"
 exit /b %ERRORLEVEL%
 
-
 :: Execute command routine that will echo out when error
 :ExecuteCmd
 setlocal
@@ -109,7 +96,6 @@ if "%ERRORLEVEL%" NEQ "0" echo Failed exitCode=%ERRORLEVEL%, command=%_CMD_%
 exit /b %ERRORLEVEL%
 
 :error
-echo %ERRORMESSAGE%
 endlocal
 echo "An error has occurred during web site deployment."
 call :exitSetErrorLevel
