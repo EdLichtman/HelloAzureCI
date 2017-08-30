@@ -3,7 +3,7 @@ $UnitTestsDir = "$Env:CURRENT_PROJECT_LOCATION"
 . "$ProjectDir\DeployScripts\NugetFunctions.ps1"
 
 
-$OutDir = "$UnitTestsDir\bin\Release"
+$OutDir = "$UnitTestsDir\bin\Debug"
 $nUnitFramework = "net-4.5"
 $PackagesDir = "$UnitTestsDir\packages"
 $nUnitVersion = "3.7.0"
