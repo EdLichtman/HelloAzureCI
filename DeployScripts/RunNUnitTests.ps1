@@ -5,16 +5,12 @@ $UnitTestsDir = "$Env:CURRENT_UNIT_TEST_PATH"
 
 $OutDir = "$UnitTestsDir\bin\Debug"
 $nUnitFramework = "net-4.5"
-$PackagesDir = "$UnitTestsDir\packages"
 $nUnitVersion = "3.7.0"
 
 Write-Output "`n----- Running Unit Tests on $UnitTestsDir -----"
 
-NugetInstall-Package "NUnit.ConsoleRunner" $nUnitVersion $PackagesDir
-
-$nunit = "$PackagesDir\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
+$nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
-
 
 $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
 $NUnitOverallResult = "Failed"
