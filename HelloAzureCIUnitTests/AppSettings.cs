@@ -21,8 +21,6 @@ namespace HelloAzureCIUnitTests
         [Test]
         public void Should_be_specific_to_Azure_environment()
         {
-            Console.WriteLine("Test to see if I can debug this in Azure");
-            throw new Exception($"Known Environmental AppSetting is : '{_KnownEnvironmentalAppSetting}'");
             Assert.That(_KnownEnvironmentalAppSetting, Is.Not.EqualTo("Azure"));
         }
 

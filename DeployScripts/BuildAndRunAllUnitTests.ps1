@@ -33,6 +33,7 @@ foreach ($CurrentUnitTestFolder in $UnitTestPaths) {
 
             )
         }
+    Write-output "Attempting to Build Command: $MSBuild_Path" $arguments
     & "$MSBuild_Path" $arguments
     & "$Env:DeployScriptsDir\RunNUnitTests.ps1"
     
