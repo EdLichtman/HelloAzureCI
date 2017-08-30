@@ -11,7 +11,7 @@ foreach ($CurrentUnitTestFolder in $UnitTestPaths) {
     $UnitTestProject = Get-ChildItem -Path "$UnitTestFolderPath" | Where-Object {$_.Name -Like "*.csproj"}
     $UnitTestProjectName = $UnitTestProject.Name
     $Env:CURRENT_PROJECT_NAME = $UnitTestProjectName
-    $Env:CURRENT_PROJECT_LOCATION = Get-DeploymentPath $CurrentUnitTestFolder 
+    $Env:CURRENT_PROJECT_LOCATION = $UnitTestFolderPath 
     
     & "$MSBuild_Path" $UnitTestProject.FullName
     RunScript RunNUnitTests
