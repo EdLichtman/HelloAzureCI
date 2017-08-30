@@ -7,20 +7,23 @@ namespace HelloAzureCIUnitTests
     [TestFixture]
     public class AppSettings
     {
+        string _KnownEnvironmentalAppSetting;
+        [SetUp]
+        public void SetUp(){
+            _KnownEnvironmentalAppSetting = ConfigurationManager.AppSettings["HelloTarget"];
+        }
 
         [Test]
         public void Should_not_be_null()
         {
-            string helloTarget = ConfigurationManager.AppSettings["HelloTarget"];
-
-            Assert.That(helloTarget, Is.Not.EqualTo(null));
+            Assert.That(_KnownEnvironmentalAppSetting, Is.Not.EqualTo(null));
         }
         [Test]
         public void Should_be_specific_to_Azure_environment()
         {
-            string helloTarget = ConfigurationManager.AppSettings["HelloTarget"];
-
-            Assert.That(helloTarget, Is.Not.EqualTo("Azure"));
+            Console.WriteLine("Test to see if I can debug this in Azure");
+            throw new Exception($"Known Environmental AppSetting is : '{_KnownEnvironmentalAppSetting}'");
+            Assert.That(_KnownEnvironmentalAppSetting, Is.Not.EqualTo("Azure"));
         }
 
         [Test]
