@@ -10,27 +10,11 @@ $nUnitVersion = "3.7.0"
 
 NugetInstall-Package "NUnit.ConsoleRunner" $nUnitVersion $PackagesDir
 
-Write-Output "Line 11"
-try {
-& more "$UnitTestsDir\App_Data\appSettings.config"
-& more "$UnitTestsDir\App_Data\connectionStrings.config"
-} catch {
-    write-Output $_.Exception.Message
-    write-output "Something went wrong while Unit Testing and spitting out app_data"
-
-}
-try {
 $nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
-} catch {
-    write-Output $_.Exception.Message
-    write-output "Something went wrong while Unit Testing and accessing nunitConsoleRunner"
-    write-output $nunit
-    write-output "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
-}
-Write-Output "Line 14 of RunNUnitTests"
+
+Write-Output "nUnit Run location is... $nUnit"
 $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
-Write-Output "Line 16 of RunNUnitTests"
 $NUnitOverallResult = "Failed"
 $NUnitTestResults | ForEach-Object {
     $trimmedResult = $_.trim()
