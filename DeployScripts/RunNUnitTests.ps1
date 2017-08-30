@@ -18,6 +18,9 @@ $nunit = "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-co
 $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
 } catch {
     write-Output $_.Exception.Message
+    write-output "Something went wrong while Unit Testing and accessing nunitConsoleRunner"
+    write-output $nunit
+    write-output "$ProjectDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
 }
 Write-Output "Line 14 of RunNUnitTests"
 $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
