@@ -1,5 +1,5 @@
 $ProjectDir = $Env:DEPLOYMENT_SOURCE
-$UnitTestsDir = "$Env:CURRENT_PROJECT_LOCATION"
+$UnitTestsDir = "$Env:CURRENT_UNIT_TEST_PATH"
 . "$ProjectDir\DeployScripts\NugetFunctions.ps1"
 
 

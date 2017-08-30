@@ -16,18 +16,3 @@ function RunScript {
     }
     
 }
-
-
-function Get-DeploymentPath {
-    param([object] $root
-        , [string] $fullPath = "")
-
-        if ($root.FullName -eq $MainSolutionDir -or "$MainSolutionDir" -eq "$($root.FullName)\." -or $root.parent.name -eq $null) {
-            Write-Output $fullPath
-            return
-        }
-        if ($fullPath) {
-            $fullPath = "\$fullPath"
-        }
-        Get-DeploymentPath $root.parent "$($root.Name)$fullPath"
-}

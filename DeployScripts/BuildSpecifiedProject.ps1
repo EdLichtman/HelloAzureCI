@@ -8,7 +8,7 @@ $InPlaceDeployment = $Env:IN_PLACE_DEPLOYMENT
 Write-Output "`n----- Building $CurrentProjectLocation-----"
 
 $Current_csproj_File = (Get-ChildItem -Path "$CurrentProjectDirectory").Where({$_.Name -Like "*.csproj"}).FullName
-Write-Output $Current_csproj_File
+
 if ($InPlaceDeployment -ne "1") {
         $arguments = @("$Current_csproj_File"
                         ,"/nologo"
