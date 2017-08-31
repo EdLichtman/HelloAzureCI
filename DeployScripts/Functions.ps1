@@ -86,16 +86,15 @@ function Build-DeployableProject {
 
 function Build-UnitTestProject {
     Param ([string] $CurrentProjectLocation)
-    $CurrentProjectDirectory = "$MainSolutionDir\$CurrentProjectLocation"
     $MSBuild_Path = $Env:MSBUILD_PATH
 
     Write-Output "`n----- Building $CurrentProjectLocation-----"
 
-    $Current_csproj_File = (Get-ChildItem -Path "$CurrentProjectDirectory").Where({$_.Name -Like "*.csproj"}).FullName
+    $Current_csproj_File = (Get-ChildItem -Path "$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
 
     & "$MSBuild_Path" $Current_csproj_File
     if ($lastexitcode -ne 0) {
-        throw "Could not build $CurrentProjectDirectory"
+        throw "Could not build $CurrentProjectLocation"
     }
     return
 }
