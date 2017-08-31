@@ -206,6 +206,7 @@ $RECYCLE.BIN/
 
 # Custom AppSettings and ConnectionStrings
 App_Data*
+Solution_Configuration*
 
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)

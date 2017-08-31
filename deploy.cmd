@@ -61,9 +61,6 @@ IF DEFINED MSBUILD_PATH goto MsbuildPathDefined
 SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 :MsbuildPathDefined
 
-SET DeployScriptsDir=%DEPLOYMENT_SOURCE%\DeployScripts
-
-SET CURRENT_PROJECT_LOCATION=HelloAzureCI
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Deployment
 :: ----------
