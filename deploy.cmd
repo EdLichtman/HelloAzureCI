@@ -70,7 +70,7 @@ SET CURRENT_PROJECT_LOCATION=HelloAzureCI
 
 echo Handling .NET Web Application deployment.
 
-Call:RunPowershellScript Deploy
+Call:RunPowershellScript PreDeploy
 IF !ERRORLEVEL! NEQ 0 goto:error 
 
 :: 3. KuduSync

@@ -1,20 +1,17 @@
 $MainSolutionDir = $Env:DEPLOYMENT_SOURCE
-$CurrentProjectLocation = $Env:CURRENT_PROJECT_LOCATION
-$CurrentProjectDirectory = "$MainSolutionDir\$CurrentProjectLocation"
+$UserDefinedSolutionConfigurationIdentifier = $Env:APPSETTING_DEPLOYVAR_SolutionConfig
+$SolutionConfigurationFolder = "$MainSolutionDir\$UserDefinedSolutionConfigurationIdentifier"
 
-Write-Output "`n----- Extracting the Application Settings from Azure to project ""$CurrentProjectLocation"" -----"
-$AppDataFolderName = (Get-ChildItem -Path $CurrentProjectDirectory).Where({$_.Name -like "Sample_*"}).Name.Replace("Sample_", "")
+if (Test-Path $SolutionConfigurationFolder) {
+    Remove-Item -path "$SolutionConfigurationFolder" -recurse | Out-Null
+}
+New-Item -ItemType Directory -Path "$SolutionConfigurationFolder" | Out-Null
 
 $EnvironmentVariables = Get-ChildItem Env: 
-$appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" }
+$appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" -and $_.Name -NotLike "*DEPLOYVAR*"}
 $connectionStrings = $EnvironmentVariables | where-object {$_.Name -like "SQLAZURECONNSTR*"}
 
-write-output "Cleaning $CurrentProjectLocation\$AppDataFolderName`n"
-Remove-Item -path "$CurrentProjectDirectory\$AppDataFolderName" -recurse | Out-Null
-New-Item -ItemType Directory -Path "$CurrentProjectDirectory\$AppDataFolderName" | Out-Null
-
-
-Write-Output "Creating $CurrentProjectLocation\$AppDataFolderName\appSettings.config"
+Write-Output "Creating $SolutionConfigurationFolder\appSettings.config"
 [xml]$appSettingsConfig = New-Object System.Xml.XmlDocument 
 $declaration = $appSettingsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $appSettingsNode = $appSettingsConfig.CreateNode("element", "appSettings", $null)
@@ -31,11 +28,11 @@ foreach ($appSetting in $appSettings) {
     }
 }
 $appSettingsConfig.AppendChild($appSettingsNode) | Out-Null
-Write-Output "Saving appSettings to: $CurrentProjectLocation\$AppDataFolderName\appSettings.config`n"
-$appSettingsConfig.save("$CurrentProjectDirectory\$AppDataFolderName\appSettings.config") 
+Write-Output "Saving appSettings to: $SolutionConfigurationFolder\appSettings.config`n"
+$appSettingsConfig.save("$SolutionConfigurationFolder\appSettings.config") 
 # other form of out-null >$null
 
-Write-Output "Creating $CurrentProjectLocation\$AppDataFolderName\connectionStrings.config"
+Write-Output "Creating $SolutionConfigurationFolder\connectionStrings.config"
 [xml]$connectionStringsConfig = New-Object System.Xml.XmlDocument
 $declaration = $connectionStringsConfig.CreateXmlDeclaration("1.0", "UTF-8",$null)
 $connectionStringsNode = $connectionStringsConfig.CreateNode("element", "connectionStrings", $null)
@@ -55,5 +52,5 @@ foreach ($connectionString in $connectionStrings) {
 
 $connectionStringsConfig.AppendChild($connectionStringsNode) | Out-Null
 
-Write-Output "Saving connectionStrings to: $CurrentProjectLocation\$AppDataFolderName\connectionStrings.config`n"
-$connectionStringsConfig.save("$CurrentProjectDirectory\$AppDataFolderName\connectionStrings.config")
+Write-Output "Saving connectionStrings to: $SolutionConfigurationFolder\connectionStrings.config`n"
+$connectionStringsConfig.save("$SolutionConfigurationFolder\connectionStrings.config")
