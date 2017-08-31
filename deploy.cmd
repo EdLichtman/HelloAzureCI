@@ -80,7 +80,7 @@ IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
 goto end
 
 :RunPowershellScript
-SET PowerShellScript="%DeployScriptsDir%\%~1.ps1"
+SET PowerShellScript="%DEPLOYMENT_SOURCE%\DeployScripts\%~1.ps1"
 Powershell.exe -executionpolicy remotesigned -Command "try { & """%PowerShellScript%""" } catch {exit 1}"
 exit /b %ERRORLEVEL%
 

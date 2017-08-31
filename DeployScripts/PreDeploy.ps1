@@ -10,7 +10,6 @@ if (-not $UserDefinedSolutionConfigurationIdentifier) {
 }
 
 $MainSolutionDir = $Env:DEPLOYMENT_SOURCE
-$MSBuild_Path = $Env:MSBUILD_PATH
 . "$MainSolutionDir\DeployScripts\Functions.ps1"
 
 
