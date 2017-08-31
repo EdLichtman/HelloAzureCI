@@ -1,3 +1,4 @@
+echo Beginning Kudu Deployment. Setting Environment Variables
 @if "%SCM_TRACE_LEVEL%" NEQ "4" @echo off
 
 :: ----------------------
@@ -65,10 +66,12 @@ SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 :: Deployment
 :: ----------
 
-echo Handling .NET Web Application deployment.
+echo Beginning Custom Pre-Deploy Script
 
 Call:RunPowershellScript PreDeploy
 IF !ERRORLEVEL! NEQ 0 goto:error 
+
+echo Synchronizing Test Repository with application root
 
 :: 3. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (

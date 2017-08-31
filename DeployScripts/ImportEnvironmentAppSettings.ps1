@@ -1,5 +1,9 @@
-$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
+#### Import UserDefined Variables from AppSettings
+## See PreDeploy about defining UserDefined Variables
 $UserDefinedSolutionConfigurationIdentifier = $Env:APPSETTING_DEPLOYVAR_SolutionConfig
+
+$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
+
 $SolutionConfigurationFolder = "$MainSolutionDir\$UserDefinedSolutionConfigurationIdentifier"
 
 if (Test-Path $SolutionConfigurationFolder) {
