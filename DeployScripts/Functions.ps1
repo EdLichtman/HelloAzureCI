@@ -89,11 +89,14 @@ function Import-EnvironmentSettingsIntoProject {
     $AppDataFolderName = (Get-ChildItem -Path $CurrentProjectDirectory).Where({$_.Name -like "Sample_*"}).Name.Replace("Sample_", "")
     $AppDataFolderLocation = "$CurrentProjectDirectory\$AppDataFolderName"
 
-    write-output "Cleaning $AppDataFolderLocation`n"
+    
     if (Test-Path $AppDataFolderLocation) {
+        write-output "Removing files from $AppDataFolderLocation`n"
         Remove-Item -path "$AppDataFolderLocation" -recurse | Out-Null
     }
     New-Item -ItemType Directory -Path "$AppDataFolderLocation" | Out-Null
+    
+    Write-Output "Copying Files from $UserDefinedSolutionConfigurationIdentifier to $AppDataFolderLocation"
     Copy-Item "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier\*" "$AppDataFolderLocation"
     
     return
@@ -177,7 +180,7 @@ function Build-ProjectWithoutMSBuildArguments {
 
     $Current_csproj_File = (Get-ChildItem -Path "$DeploymentSource\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
 
-    & "$MSBuild_Path" $Current_csproj_File
+    & "$MSBuild_Path" $Current_csproj_File /verbosity:m
     if ($lastexitcode -ne 0) {
         throw "Could not build $CurrentProjectLocation"
     }
@@ -212,7 +215,7 @@ function Run-nUnitTests {
     $nunit = "$DeploymentSource\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
     $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
 
-    $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
+    $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir 
     $NUnitOverallResult = "Failed"
     $NUnitTestResults | ForEach-Object {
         $trimmedResult = $_.trim()

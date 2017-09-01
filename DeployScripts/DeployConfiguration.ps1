@@ -61,9 +61,6 @@ If (-not $env:KUDU_SYNC_CMD) {
     $env:KUDU_SYNC_CMD = "$env:APPDATA\npm\kuduSync.cmd"
 }
 
-[Environment]::SetEnvironmentVariable("KUDU_SYNC_CMD",$null)
-& npm uninstall kudusync -g --silent
-
 If (-not $env:DEPLOYMENT_TEMP) {
     $env:DEPLOYMENT_TEMP = "$ENV:TEMP\___deployTemp$($(Get-Random -Minimum 0 -Maximum 32767))"
     $env:CLEAN_LOCAL_DEPLOYMENT_TEMP = "true"
@@ -80,17 +77,13 @@ if (-not $env:MSBUILD_PATH) {
     $env:MSBUILD_PATH = "${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\MSBuild.exe"
 }
 
-
-
+$DeploymentSource = $Env:DEPLOYMENT_SOURCE
+$DeploymentScriptsDirectory = "$DeploymentSource\DeployScripts"
 
 #### Import UserDefined Variables from AppSettings
 ## To Define your custom variables, 
 ## add them to the Application Settings on Azure.
 ## Key should start with DEPLOYVAR_
-
-#Transfer the Setting of UserDefinedVariables in Deploy Script configuration file, not PreDeploy steps.
-$DeploymentSource = $Env:DEPLOYMENT_SOURCE
-$DeploymentScriptsDirectory = "$DeploymentSource\DeployScripts"
 $UserDefinedTestFolderIdentifier = $Env:APPSETTING_DEPLOYVAR_TestFolderIdentifier
 $UserDefinedSolutionConfigurationIdentifier = $Env:APPSETTING_DEPLOYVAR_SolutionConfig
 if (-not $UserDefinedTestFolderIdentifier) {
@@ -99,3 +92,7 @@ if (-not $UserDefinedTestFolderIdentifier) {
 if (-not $UserDefinedSolutionConfigurationIdentifier) {
     $UserDefinedSolutionConfigurationIdentifier = "Solution_Configuration"
 }
+
+$SolutionConfigurationFolder = "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier"
+$EnvironmentVariables = Get-ChildItem Env: 
+$AllProjectDirectories = Get-ChildItem $DeploymentSource | Where-Object {$_.PSIsContainer -and (Test-Path -Path "$DeploymentSource\$_\*.csproj")} 

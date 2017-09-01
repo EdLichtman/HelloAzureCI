@@ -1,14 +1,10 @@
 #### Importing Application Settings and Configuration Settings from Azure Environment
 Write-Output "`n----- Importing Application Settings and Configuration Settings from Azure Environment -----"
-$SolutionConfigurationFolder = "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier"
 
 if (Test-Path $SolutionConfigurationFolder) {
     Remove-Item -path "$SolutionConfigurationFolder" -recurse | Out-Null
 }
 New-Item -ItemType Directory -Path "$SolutionConfigurationFolder" | Out-Null
-
-##### Get Variables
-$EnvironmentVariables = Get-ChildItem Env: 
 
 $appSettings = $EnvironmentVariables | where-object { $_.Name -like "APPSETTING*" -and $_.Name -NotLike "*DEPLOYVAR*"}
 $appSettingConfiguration = New-Object 'object[]' $appSettings.Count
@@ -59,9 +55,6 @@ foreach ($SolutionFile in $AllSolutionFiles) {
     Write-Output "Restored NuGet Packages for $($SolutionFile.Name)"
 
 }
-
-#### Finding all directories that are defined as Project Directories, and contain a .csproj file
-$AllProjectDirectories = Get-ChildItem $DeploymentSource | Where-Object {$_.PSIsContainer -and (Test-Path -Path "$DeploymentSource\$_\*.csproj")} 
 
 #### Compiling all Non-Unit Test Projects from those directories based on UserDefined Naming Convention
 Write-Output "----- Building all non-Test Projects -----"
