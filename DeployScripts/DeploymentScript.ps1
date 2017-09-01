@@ -1,6 +1,6 @@
 #### Importing Application Settings and Configuration Settings from Azure Environment
 Write-Output "`n----- Importing Application Settings and Configuration Settings from Azure Environment -----"
-$SolutionConfigurationFolder = "$DeploymentSource$UserDefinedSolutionConfigurationIdentifier"
+$SolutionConfigurationFolder = "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier"
 
 if (Test-Path $SolutionConfigurationFolder) {
     Remove-Item -path "$SolutionConfigurationFolder" -recurse | Out-Null
