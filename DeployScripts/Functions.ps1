@@ -1,40 +1,5 @@
 ##############################
 #.SYNOPSIS
-#Runs Powershell Script
-#
-#.DESCRIPTION
-#Runs Powershell Script via script name. Throws Error if Script Fails
-#
-#.PARAMETER ScriptName
-#ScriptName should be the name of a ps1 file within the \DeployScripts folder. 
-#It should not contain .ps1
-#
-#.EXAMPLE
-#RunScript Functions
-#
-
-##############################
-function RunScript {
-    param([string] $ScriptName)
-    $DeployScriptsDirectory = "$DeploymentSource\DeployScripts"
-    
-    try {
-        & "$DeployScriptsDirectory\$ScriptName.ps1"
-        $errorLevel = 0
-    } catch {
-        write-output $_
-        $errorLevel = 1
-    }
-    if ($errorLevel -ne 0) {
-        Write-Output "Error while Running $ScriptName"
-        throw $errorLevel
-    }
-    
-    return
-}
-
-##############################
-#.SYNOPSIS
 #Restores NuGet Packages on entire solution
 #
 #.DESCRIPTION
@@ -50,8 +15,7 @@ function RunScript {
 #.NOTES
 #There can be multiple .sln files in a git-versioned repository
 ##############################
-function Restore-NugetPackagesOnSolution {
-    param ([string] $SolutionExecutablePath)
+function Restore-NugetPackagesOnSolution([string] $SolutionExecutablePath) {
     Start-Job -Name RunNugetCommand -Scriptblock {param($sln)
         & nuget restore "$sln" 2>&1 | Out-Null
         write-output $lastExitCode
@@ -81,9 +45,9 @@ function Restore-NugetPackagesOnSolution {
 #.NOTES
 #General notes
 ##############################
-function Import-EnvironmentSettingsIntoProject {
-    Param([string] $CurrentProjectLocation
-        , [string] $UserDefinedSolutionConfigurationIdentifier)
+function Import-EnvironmentSettingsIntoProject([string] $CurrentProjectLocation
+                                            , [string] $UserDefinedSolutionConfigurationIdentifier) {
+
     $CurrentProjectDirectory = "$DeploymentSource\$CurrentProjectLocation"
     Write-Output "`n----- Copying Extracted AppSettings to ""$CurrentProjectLocation"" -----"
     $AppDataFolderName = (Get-ChildItem -Path $CurrentProjectDirectory).Where({$_.Name -like "Sample_*"}).Name.Replace("Sample_", "")
@@ -118,16 +82,14 @@ function Import-EnvironmentSettingsIntoProject {
 #.NOTES
 #This is different because it uses Kudu-Specific arguments alongside MSBuild
 ##############################
-function Build-DeployableProject {
-    Param ([string] $CurrentProjectLocation)
+function Build-DeployableProject([string] $CurrentProjectLocation) {
+     
     $CurrentProjectDirectory = "$DeploymentSource\$CurrentProjectLocation"
-    $MSBuild_Path = $Env:MSBUILD_PATH
-    $InPlaceDeployment = $Env:IN_PLACE_DEPLOYMENT   
 
     Write-Output "`n----- Building $CurrentProjectLocation-----"
 
     $Current_csproj_File = (Get-ChildItem -Path "$CurrentProjectDirectory").Where({$_.Name -Like "*.csproj"}).FullName
-    if ($InPlaceDeployment -ne "1") {
+    if ($env:IN_PLACE_DEPLOYMENT  -ne "1") {
             $arguments = @("$Current_csproj_File"
                             ,"/nologo"
                             ,"/verbosity:m" 
@@ -144,12 +106,12 @@ function Build-DeployableProject {
                 ,"/verbosity:m"
                 ,"/t:Build"
                 ,"/p:AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false"
-                ,"/p:SolutionDir=""$MainProjectDir\.\\"""
+                ,"/p:SolutionDir=""$DeploymentSource\.\\"""
                 ,"$Env:SCM_BUILD_ARGS"
 
             )
         }
-    & "$MSBuild_Path" $arguments
+    & "$env:MSBUILD_PATH" $arguments
     if ($lastexitcode -ne 0) {
         throw "Could not build $CurrentProjectDirectory"
     }
@@ -172,10 +134,7 @@ function Build-DeployableProject {
 #.NOTES
 #Used when the project is not deployable
 ##############################
-function Build-ProjectWithoutMSBuildArguments {
-    Param ([string] $CurrentProjectLocation)
-    $MSBuild_Path = $Env:MSBUILD_PATH
-
+function Build-ProjectWithoutMSBuildArguments([string] $CurrentProjectLocation) {
     Write-Output "`n----- Building $CurrentProjectLocation-----"
 
     $Current_csproj_File = (Get-ChildItem -Path "$DeploymentSource\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
@@ -203,8 +162,7 @@ function Build-ProjectWithoutMSBuildArguments {
 #Run-nUnitTests HelloAzureCIUnitTests
 #
 ##############################
-function Run-nUnitTests {
-    Param ([string] $CurrentProjectLocation)
+function Run-nUnitTests([string] $CurrentProjectLocation) {
     $UnitTestsDir = "$DeploymentSource\$CurrentProjectLocation"
     $OutDir = "$UnitTestsDir\bin\Debug"
     $nUnitFramework = "net-4.5"

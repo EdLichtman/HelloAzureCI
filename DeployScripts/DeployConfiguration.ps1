@@ -1,20 +1,10 @@
 $ErrorActionPreference = "stop"
-if ($env:SCM_TRACE_LEVEL -ne 4 ) {
-  # Equivalent of Echo off -- set write-verbose to false?
-  # @if "%SCM_TRACE_LEVEL%" NEQ "4" @echo off
-
-#   $SaveVerbosePreference = $global:VerbosePreference;
-# $global:VerbosePreference = 'SilentlyContinue';
-
-# Import-module "Whatever";
-
-# $global:VerbosePreference = $SaveVerbosePreference;
-# Then I just call the script like so:
-
-# PowerShell -file something.ps1 -Verbose
-
-#https://stackoverflow.com/questions/22537863/suppressing-verbose-for-import-module
-#$VerbosePreference
+if ($env:SCM_TRACE_LEVEL -eq 4 ) {
+    #In the batch script if $env:SCM_TRACE_LEVEL is not 4
+    #Set Echo to off. There isn't really an equivalent so 
+    #since VerbosePreference is default Silent, if it is 4
+    #We set it to "be verbose"
+    $VerbosePreference = "Continue"
 }
 
 # -------------------------------
@@ -72,7 +62,7 @@ If ($env:CLEAN_LOCAL_DEPLOYMENT_TEMP) {
          New-Item -ItemType directory -Path "$env:DEPLOYMENT_TEMP"
     }
 }
-[Environment]::SetEnvironmentVariable("MSBUILD_PATH",$null)
+
 if (-not $env:MSBUILD_PATH) {
     $env:MSBUILD_PATH = "${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\MSBuild.exe"
 }
