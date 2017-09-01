@@ -139,7 +139,7 @@ function Build-ProjectWithoutMSBuildArguments([string] $CurrentProjectLocation) 
 
     $Current_csproj_File = (Get-ChildItem -Path "$DeploymentSource\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
 
-    & "$MSBuild_Path" $Current_csproj_File /verbosity:m
+    & "$env:MSBUILD_PATH" $Current_csproj_File /verbosity:m
     if ($lastexitcode -ne 0) {
         throw "Could not build $CurrentProjectLocation"
     }
