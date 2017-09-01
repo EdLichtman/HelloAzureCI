@@ -79,7 +79,7 @@ foreach ($CurrentUnitTestDirectory in $UnitTestProjectDirectories) {
 
 #### Run KuduSync to Synchronize Test Repo with Root
 if ($env:IN_PLACE_DEPLOYMENT -ne 1) {
-    & """$env:KUDU_SYNC_CMD"" -v 50 -f ""$env:DEPLOYMENT_TEMP"" -t ""$env:DEPLOYMENT_TARGET"" -n ""$env:NEXT_MANIFEST_PATH"" -p ""$env:PREVIOUS_MANIFEST_PATH"" -i "".git;.hg;.deployment;deploy.cmd"""
+    & "$env:KUDU_SYNC_CMD" -v 50 -f "$env:DEPLOYMENT_TEMP" -t "$env:DEPLOYMENT_TARGET" -n "$env:NEXT_MANIFEST_PATH" -p "$env:PREVIOUS_MANIFEST_PATH" -i ".git;.hg;.deployment;deploy.cmd"
 }
 
 Write-Output "Deploy Successful!"
