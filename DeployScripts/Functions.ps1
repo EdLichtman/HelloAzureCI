@@ -1,6 +1,3 @@
-#### Importing Environment Variables and External Function Files
-$MainSolutionDir = $Env:DEPLOYMENT_SOURCE
-
 ##############################
 #.SYNOPSIS
 #Runs Powershell Script
@@ -19,7 +16,7 @@ $MainSolutionDir = $Env:DEPLOYMENT_SOURCE
 ##############################
 function RunScript {
     param([string] $ScriptName)
-    $DeployScriptsDirectory = "$MainSolutionDir\DeployScripts"
+    $DeployScriptsDirectory = "$DeploymentSource\DeployScripts"
     
     try {
         & "$DeployScriptsDirectory\$ScriptName.ps1"
@@ -87,7 +84,7 @@ function Restore-NugetPackagesOnSolution {
 function Import-EnvironmentSettingsIntoProject {
     Param([string] $CurrentProjectLocation
         , [string] $UserDefinedSolutionConfigurationIdentifier)
-    $CurrentProjectDirectory = "$MainSolutionDir\$CurrentProjectLocation"
+    $CurrentProjectDirectory = "$DeploymentSource\$CurrentProjectLocation"
     Write-Output "`n----- Copying Extracted AppSettings to ""$CurrentProjectLocation"" -----"
     $AppDataFolderName = (Get-ChildItem -Path $CurrentProjectDirectory).Where({$_.Name -like "Sample_*"}).Name.Replace("Sample_", "")
     $AppDataFolderLocation = "$CurrentProjectDirectory\$AppDataFolderName"
@@ -97,7 +94,7 @@ function Import-EnvironmentSettingsIntoProject {
         Remove-Item -path "$AppDataFolderLocation" -recurse | Out-Null
     }
     New-Item -ItemType Directory -Path "$AppDataFolderLocation" | Out-Null
-    Copy-Item "$MainSolutionDir\$UserDefinedSolutionConfigurationIdentifier\*" "$AppDataFolderLocation"
+    Copy-Item "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier\*" "$AppDataFolderLocation"
     
     return
 }
@@ -120,7 +117,7 @@ function Import-EnvironmentSettingsIntoProject {
 ##############################
 function Build-DeployableProject {
     Param ([string] $CurrentProjectLocation)
-    $CurrentProjectDirectory = "$MainSolutionDir\$CurrentProjectLocation"
+    $CurrentProjectDirectory = "$DeploymentSource\$CurrentProjectLocation"
     $MSBuild_Path = $Env:MSBUILD_PATH
     $InPlaceDeployment = $Env:IN_PLACE_DEPLOYMENT   
 
@@ -134,7 +131,7 @@ function Build-DeployableProject {
                             ,"/t:Build" 
                             ,"/t:pipelinePreDeployCopyAllFilesToOneFolder" 
                             ,"/p:_PackageTempDir=""$Env:DEPLOYMENT_TEMP"";AutoParameterizationWebConfigConnectionStrings=false;Configuration=Release;UseSharedCompilation=false" 
-                            ,"/p:SolutionDir=""$MainSolutionDir\.\\"""
+                            ,"/p:SolutionDir=""$DeploymentSource\.\\"""
                             ,"$Env:SCM_BUILD_ARGS")
 
         } else {
@@ -178,7 +175,7 @@ function Build-ProjectWithoutMSBuildArguments {
 
     Write-Output "`n----- Building $CurrentProjectLocation-----"
 
-    $Current_csproj_File = (Get-ChildItem -Path "$MainSolutionDir\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
+    $Current_csproj_File = (Get-ChildItem -Path "$DeploymentSource\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
 
     & "$MSBuild_Path" $Current_csproj_File
     if ($lastexitcode -ne 0) {
@@ -205,14 +202,14 @@ function Build-ProjectWithoutMSBuildArguments {
 ##############################
 function Run-nUnitTests {
     Param ([string] $CurrentProjectLocation)
-    $UnitTestsDir = "$MainSolutionDir\$CurrentProjectLocation"
+    $UnitTestsDir = "$DeploymentSource\$CurrentProjectLocation"
     $OutDir = "$UnitTestsDir\bin\Debug"
     $nUnitFramework = "net-4.5"
     $nUnitVersion = "3.7.0"
 
     Write-Output "`n----- Running Unit Tests on $UnitTestsDir -----"
     
-    $nunit = "$MainSolutionDir\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
+    $nunit = "$DeploymentSource\packages\NUnit.ConsoleRunner.$nUnitVersion\tools\nunit3-console.exe"
     $tests = (Get-ChildItem $OutDir -Recurse -Include *Tests.dll)
 
     $NUnitTestResults = & $nunit $tests --noheader --framework=$nUnitFramework --work=$OutDir
@@ -231,3 +228,57 @@ function Run-nUnitTests {
 
 }
 
+##############################
+#.SYNOPSIS
+#Creates a configuration xml file
+#
+#.DESCRIPTION
+#Creates a solution configuration xml file on the basis: 
+#1. It is one level deep
+#2. Each child Property is "add" and you declare attributes
+#
+#.PARAMETER SolutionConfigurationFolder
+#Parameter description
+#
+#.PARAMETER EnvironmentVariablesConfiguration
+#Parameter description
+#
+#.PARAMETER nameOfConfigurationFile
+#Parameter description
+#
+#.PARAMETER nameOfConfigurationNode
+#Parameter description
+#
+#.EXAMPLE
+#An example
+#
+#.NOTES
+#General notes
+##############################
+function Create-ConfigurationXML ($SolutionConfigurationFolder
+                                ,$EnvironmentVariablesConfiguration
+                                ,$nameOfConfigurationFile
+                                ,$nameOfConfigurationNode) {
+
+    $CompleteConfigurationFilePath = "$SolutionConfigurationFolder\$nameOfConfigurationFile"
+
+    Write-Output "Creating $nameOfConfigurationFile"
+    [xml]$configFile = New-Object System.Xml.XmlDocument 
+    $declaration = $configFile.CreateXmlDeclaration("1.0","UTF-8",$null)
+    $configFile.AppendChild($declaration) | Out-Null
+
+    $mainConfigurationNode = $configFile.CreateNode("element", "$nameOfConfigurationNode", $null)
+    $configFile.AppendChild($mainConfigurationNode)
+
+    foreach ($configuration in $EnvironmentVariablesConfiguration) {
+        $configurationNode = $configFile.CreateNode("element", "add", $null)
+        foreach ($key in $configuration.keys) {
+            $configurationNode.SetAttribute("$key", $configuration.Item($key))
+        }
+        $mainConfigurationNode.AppendChild($configurationNode) | Out-Null
+    }
+    
+
+    Write-Output "Saving $nameOfConfigurationNode to: $CompleteConfigurationFilePath`n"
+    $configFile.save("$CompleteConfigurationFilePath") 
+}
