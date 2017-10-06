@@ -139,7 +139,7 @@ function Build-ProjectWithoutMSBuildArguments([string] $CurrentProjectLocation) 
 
     $Current_csproj_File = (Get-ChildItem -Path "$DeploymentSource\$CurrentProjectLocation").Where({$_.Name -Like "*.csproj"}).FullName
 
-    & "$env:MSBUILD_PATH" $Current_csproj_File /verbosity:m
+    & "$env:MSBUILD_PATH" $Current_csproj_File /verbosity:m /p:SolutionDir="$DeploymentSource\.\\"
     if ($lastexitcode -ne 0) {
         throw "Could not build $CurrentProjectLocation"
     }
@@ -182,7 +182,7 @@ function Run-nUnitTests([string] $CurrentProjectLocation) {
         }     
     }
     Write-Output $NUnitTestResults
-    if ($NUnitOverallResult -ne "Passed")
+    if ($NUnitOverallResult -eq "Failed" -or $NUnitOverallResult -eq "Inconclusive")
     {
         throw "nUnit Tests Failed for $UnitTestsDir"
     }
@@ -242,4 +242,24 @@ function Create-ConfigurationXML ($SolutionConfigurationFolder
 
     Write-Output "Saving $nameOfConfigurationNode to: $CompleteConfigurationFilePath`n"
     $configFile.save("$CompleteConfigurationFilePath") 
+}
+
+function ValidateIf-NotDeployable($projectFolderName) {
+    $IsDeployable = $TRUE
+    foreach ($NonDeployableIdentifier in $NonDeployableProjectIdentifiers) {
+        if($projectFolderName -Like $NonDeployableIdentifier) {
+            $IsDeployable = $FALSE
+        }
+    }
+    $IsDeployable -eq 0
+}
+
+function ValidateIf-IsTest($projectFolderName) {
+    $IsTest = $FALSE
+    foreach ($TestProjectIdentifier in $UserDefinedTestFolderIdentifiers) {
+        if($projectFolderName -Like $TestProjectIdentifier) {
+            $IsTest = $TRUE
+        }
+    }
+    $IsTest -eq 1
 }

@@ -74,13 +74,31 @@ $DeploymentScriptsDirectory = "$DeploymentSource\DeployScripts"
 ## To Define your custom variables, 
 ## add them to the Application Settings on Azure.
 ## Key should start with DEPLOYVAR_
-$UserDefinedTestFolderIdentifier = $Env:APPSETTING_DEPLOYVAR_TestFolderIdentifier
-$UserDefinedSolutionConfigurationIdentifier = $Env:APPSETTING_DEPLOYVAR_SolutionConfig
-if (-not $UserDefinedTestFolderIdentifier) {
-    $UserDefinedTestFolderIdentifier = "*Tests"
+$NonDeployableProjectIdentifierList = $Env:APPSETTING_DEPLOYVAR_NonDeployableProjectsIdentifiers
+if (-not $NonDeployableProjectIdentifierList) {
+    $NonDeployableProjectIdentifierList = "*Tests"
 }
+$NonDeployableProjectIdentifiers = $NonDeployableProjectIdentifierList -split ","
+
+$UserDefinedTestFolderCommaDelimitedList = $Env:APPSETTING_DEPLOYVAR_TestFolderIdentifiers
+if (-not $UserDefinedTestFolderCommaDelimitedList) {
+    $UserDefinedTestFolderCommaDelimitedList = "*Tests"
+}
+$UserDefinedTestFolderIdentifiers = $UserDefinedTestFolderCommaDelimitedList -split ","
+
+$UserDefinedSolutionConfigurationIdentifier = $Env:APPSETTING_DEPLOYVAR_SolutionConfig
 if (-not $UserDefinedSolutionConfigurationIdentifier) {
     $UserDefinedSolutionConfigurationIdentifier = "Solution_Configuration"
+}
+
+$ShouldRunUnitTestsIdentifier = $Env:APPSETTING_DEPLOYVAR_ShouldRunTests
+if (-not $ShouldRunUnitTestsIdentifier) {
+    $ShouldRunUnitTestsIdentifier = "false"
+}
+if ($ShouldRunUnitTestsIdentifier -eq "false") {
+    $ShouldRunUnitTests = $FALSE
+}  else {
+    $ShouldRunUnitTests = $TRUE
 }
 
 $SolutionConfigurationFolder = "$DeploymentSource\$UserDefinedSolutionConfigurationIdentifier"

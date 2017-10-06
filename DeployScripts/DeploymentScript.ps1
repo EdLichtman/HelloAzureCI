@@ -24,11 +24,12 @@ for ($i=0; $i -le $connectionStrings.Count - 1; $i++) {
     
     $connectionStringConfiguration[$i] = @{
         "name"="$($connectionString.Name -replace 'SQLAZURECONNSTR_', '')";
-        "connectionString"="$($connectionString.ConnectionString)"
+        "connectionString"="$($connectionString.Value)"
+        
     }
+
 }
 Create-ConfigurationXML $SolutionConfigurationFolder $connectionStringConfiguration "connectionStrings.config" "connectionStrings"
-
 
 
 #### Removing all Previously compiled code from entire solution
@@ -58,7 +59,28 @@ foreach ($SolutionFile in $AllSolutionFiles) {
 
 #### Compiling all Non-Unit Test Projects from those directories based on UserDefined Naming Convention
 Write-Output "----- Building all non-Test Projects -----"
-$NonUnitTestProjectDirectories = $AllProjectDirectories | Where-Object {$_.Name -NotLike "$UserDefinedTestFolderIdentifier"}
+
+
+$NonUnitTestProjectDirectories = @()
+$UnitTestProjectDirectories = @()
+foreach($projectDirectory in $AllProjectDirectories) {
+    $projectIsDeployable = $TRUE
+
+    if (ValidateIf-NotDeployable $projectDirectory.Name) {
+        $projectIsDeployable = $FALSE
+    }
+    if (ValidateIf-IsTest $projectDirectory.Name) {
+        $projectIsDeployable = $FALSE
+    }
+
+    if ($projectIsDeployable) {
+        $NonUnitTestProjectDirectories += $projectDirectory
+    } else {
+        $UnitTestProjectDirectories += $projectDirectory
+    }
+}
+
+
 foreach ($CurrentProjectDirectory in $NonUnitTestProjectDirectories) {
     $CurrentProjectPath = $CurrentProjectDirectory.Name
     
@@ -68,13 +90,17 @@ foreach ($CurrentProjectDirectory in $NonUnitTestProjectDirectories) {
 
 #### Compiling all Unit Test Projects from those directories based on UserDefined Naming Convention
 ### Also Running NUnit Tests on those project dlls
-Write-Output "`n----- Beginning Unit Tests -----"
-$UnitTestProjectDirectories = $AllProjectDirectories | Where-Object {$_.Name -Like "$UserDefinedTestFolderIdentifier"}
-
+ Write-Output "`n----- Beginning Work on Test Directories -----"
 foreach ($CurrentUnitTestDirectory in $UnitTestProjectDirectories) {
     $UnitTestFolderName = $CurrentUnitTestDirectory.Name
     Build-ProjectWithoutMSBuildArguments $UnitTestFolderName
-    Run-nUnitTests $UnitTestFolderName
+
+    if ($ShouldRunUnitTests) {
+        if (ValidateIf-IsTest $UnitTestFolderName) {
+            Run-nUnitTests $UnitTestFolderName
+        }
+    }
+
 }
 
 #### Run KuduSync to Synchronize Test Repo with Root
